@@ -477,7 +477,7 @@ def generate_skill_chart():
     return jsonify(skills)
 
 def get_groq_response(user_input, language="english"):
-    groq_api_key = ""#paste api key here
+    groq_api_key = "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"#paste api key here
     if not groq_api_key:
         return {"response": "API key not configured."}
     
