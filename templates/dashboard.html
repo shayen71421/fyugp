@@ -1,0 +1,938 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EduSync - Student Dashboard</title>
+  <style>
+    :root {
+      --primary: #3498db;
+      --secondary: #2ecc71;
+      --dark: #34495e;
+      --light: #ecf0f1;
+      --accent: #9b59b6;
+      --recruiter: #00b894;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .dashboard {
+      display: flex;
+      min-height: 100vh;
+      background: var(--light);
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #fff;
+      padding: 2rem;
+      box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+    }
+
+    .sidebar h2 {
+      color: var(--primary);
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-menu {
+      list-style: none;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .menu-item:hover {
+      background: #f5f5f5;
+    }
+
+    .menu-item.active {
+      background: var(--recruiter);
+      color: white;
+    }
+
+    .menu-item span {
+      margin-left: 1rem;
+    }
+
+    .main-content {
+      flex: 1;
+      padding: 2rem;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    /* Section styles */
+    .section {
+      margin-bottom: 2rem;
+      background: #fff;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .section h2 {
+      margin-bottom: 1rem;
+      color: var(--dark);
+    }
+
+    .section label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    .section input, 
+    .section textarea, 
+    .section select {
+      width: 100%;
+      padding: 10px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .section button {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .section button:hover {
+      background: #5568d3;
+    }
+
+    pre {
+      background: #f8f8f8;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+
+    #skillChart {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .skill {
+      flex: 1 0 150px;
+      text-align: center;
+      padding: 10px;
+      background: #eef;
+      border: 1px solid #ccd;
+      border-radius: 4px;
+    }
+
+    #chatbox {
+      border: 1px solid #ccc;
+      padding: 10px;
+      height: 250px;
+      overflow-y: auto;
+      background: #fafafa;
+      border-radius: 4px;
+      margin-top: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    /* Additional CSS for course cards */
+    .course-card {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 10px;
+      margin: 10px;
+      display: inline-block;
+      width: 250px;
+      background: #fff;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .course-card h4 {
+      margin: 0.5rem 0;
+      color: var(--primary);
+      font-size: 1rem;
+    }
+    .course-card p {
+      font-size: 0.9rem;
+      color: var(--dark);
+      margin: 0.3rem 0; 
+    }
+    /* Mandatory course indicated as a small dot */
+    .mandatory-dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <div class="dashboard">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>EduSync</h2>
+      <ul class="sidebar-menu" id="sidebar-menu">
+        <li class="menu-item active" onclick="showSection('profileSection')"><span>Profile</span></li>
+        <li class="menu-item" onclick="showSection('courseDetailsSection')"><span>Courses</span></li>
+        <li class="menu-item" onclick="showSection('academicHistorySection')"><span>Academic History</span></li>
+        <li class="menu-item" onclick="showSection('recommendSection')"><span>Recommendations</span></li>
+        <li class="menu-item" onclick="showSection('predictGradesSection')"><span>Predict Grades</span></li>
+        <li class="menu-item" onclick="showSection('skillChartSection')"><span>Skill Chart</span></li>
+        <li class="menu-item" onclick="showSection('chatSection')"><span>Chat with AI</span></li>
+      </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1>Student Dashboard</h1>
+        <div class="user-profile">
+          <img src="https://i.pravatar.cc/150" alt="User Avatar" class="user-avatar" id="user-avatar">
+          <span id="user-name">Guest</span>
+        </div>
+      </div>
+      
+      <!-- Registration/Login Modal (shown if not logged in) -->
+      <div id="authSection" class="section">
+        <div id="authToggle">
+          <button onclick="showRegistration()">Register</button>
+          <button onclick="showLogin()">Login</button>
+        </div>
+        <div id="registrationSection" class="hidden">
+          <h2>Sign Up</h2>
+          <label for="regUsername">Username:</label>
+          <input type="text" id="regUsername" placeholder="Choose a username">
+          <label for="regPassword">Password:</label>
+          <input type="password" id="regPassword" placeholder="Choose a password">
+          <label for="regName">Name:</label>
+          <input type="text" id="regName" placeholder="Your full name">
+          <label for="regAge">Age:</label>
+          <input type="number" id="regAge" placeholder="Your age">
+          <label for="regDiscipline">Discipline:</label>
+          <input type="text" id="regDiscipline" placeholder="e.g., Zoology">
+          <label for="regSemester">Current Semester:</label>
+          <input type="number" id="regSemester" placeholder="Enter current semester">
+          <button onclick="registerUser()">Register</button>
+          <p id="regMessage" style="color:red;"></p>
+        </div>
+        <div id="loginSection" class="hidden">
+          <h2>User Login</h2>
+          <label for="loginUsername">Username:</label>
+          <input type="text" id="loginUsername" placeholder="Enter username">
+          <label for="loginPassword">Password:</label>
+          <input type="password" id="loginPassword" placeholder="Enter password">
+          <button onclick="loginUser()">Login</button>
+          <p id="loginMessage" style="color:red;"></p>
+        </div>
+      </div>
+      
+      <!-- Dashboard Content Sections (hidden until logged in) -->
+      <div id="dashboardContent" class="hidden">
+        <!-- Profile Section -->
+        <div id="profileSection" class="section">
+          <h2>Your Profile</h2>
+          <form id="profileForm">
+            <label for="profileUsername">Username:</label>
+            <input type="text" id="profileUsername" disabled>
+            
+            <label for="profileName">Name:</label>
+            <input type="text" id="profileName">
+            
+            <label for="profileAge">Age:</label>
+            <input type="number" id="profileAge">
+            
+            <label for="profileDiscipline">Discipline:</label>
+            <input type="text" id="profileDiscipline">
+            
+            <label for="profileSemester">Current Semester:</label>
+            <input type="number" id="profileSemester">
+            
+            <label for="profileCareerGoal">Career Goal / Interests:</label>
+            <input type="text" id="profileCareerGoal" placeholder="e.g., Research, Management, etc.">
+            
+            <button type="button" id="editProfileBtn" onclick="toggleEdit(true)">Edit</button>
+            <button type="button" id="saveProfileBtn" onclick="updateProfile()" class="hidden">Save</button>
+            <button type="button" id="cancelProfileBtn" onclick="toggleEdit(false)" class="hidden">Cancel</button>
+            <p id="profileMessage" style="color:green;"></p>
+          </form>
+        </div>
+        
+        <!-- Course Details Section -->
+        <div id="courseDetailsSection" class="section hidden">
+          <h2>Course Details</h2>
+          <label for="courseSemester">Semester:</label>
+          <input type="number" id="courseSemester" placeholder="Enter semester">
+          <button onclick="getCourses()">Get Courses</button>
+          <div id="coursesOutput"></div>
+        </div>
+        
+        <!-- Academic History Section -->
+        <div id="academicHistorySection" class="section hidden">
+          <h2>Academic History</h2>
+          
+          <!-- Form to Add New Academic History Record -->
+          <div id="addHistoryForm">
+            <h3>Add Academic History</h3>
+            <label for="addHistorySemester">Semester:</label>
+            <select id="addHistorySemester" onchange="loadSubjectsForAdd()">
+              <!-- Populate with semesters before current semester -->
+            </select>
+            
+            <label for="subjectDropdown">Select Subject:</label>
+            <select id="subjectDropdown">
+              <option>Loading subjects...</option>
+            </select>
+            
+            <label for="subjectGrade">Grade:</label>
+            <input type="number" id="subjectGrade" placeholder="Enter grade">
+            
+            <label for="subjectAttendance">Attendance (%):</label>
+            <input type="number" id="subjectAttendance" placeholder="Enter attendance">
+            
+            <button onclick="addHistory()">Add Academic History</button>
+            <p id="historyOutput"></p>
+          </div>
+          
+          <hr>
+          
+          <!-- Filter & Display Saved Records -->
+          <div id="filterHistory">
+            <h3>View Academic Records</h3>
+            <label for="historySemester">Show Records for Semester:</label>
+            <select id="historySemester" onchange="loadHistory()">
+              <!-- Populate with semesters before current semester -->
+            </select>
+          </div>
+          
+          <!-- Display Area -->
+          <div id="historyDisplay"></div>
+          <!-- Overall CGPA -->
+          <div id="cgpaDisplay"></div>
+        </div>
+        
+        <!-- Recommend Courses Section -->
+        <div id="recommendSection" class="section hidden">
+          <h2>Recommend Courses for Next Semester</h2>
+          <label for="currentSemesterRec">Current Semester:</label>
+          <input type="number" id="currentSemesterRec" placeholder="Enter current semester">
+          <button onclick="recommendCourses()">Recommend Courses</button>
+          <div id="recommendOutput" style="margin-top:15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;"></div>
+        </div>
+        
+        <!-- Predict Grades Section -->
+        <div id="predictGradesSection" class="section hidden">
+          <h2>Predict Needed Grades</h2>
+          
+          <!-- Semester selection dropdown (only past semesters) -->
+          <label for="predictSemester">Select Past Semester:</label>
+          <select id="predictSemester" onchange="loadPredictData()">
+            <!-- Options populated dynamically -->
+          </select>
+          
+          <!-- Input for Dream/Target Grade -->
+          <label for="dreamGrade">Target (Dream) Grade (%):</label>
+          <input type="number" id="dreamGrade" placeholder="e.g., 85">
+          
+          <button onclick="predictNeededGrade()">Predict Needed Grade</button>
+          
+          <!-- Output container for formatted prediction results -->
+          <div id="predictOutput" style="margin-top:15px;"></div>
+        </div>
+        
+        <!-- Skill Chart Section -->
+        <div id="skillChartSection" class="section hidden">
+          <h2>Skill Chart</h2>
+          <button onclick="getSkillChart()">Generate Skill Chart</button>
+          <button onclick="getSkillChart(true)">Reload Skill Chart</button>
+          <canvas id="skillRadarChart" width="400" height="400"></canvas>
+        </div>
+        
+        <!-- Chat with AI Section -->
+        <div id="chatSection" class="section hidden">
+          <h2>Chat with AI</h2>
+          <div id="chatbox"></div>
+          <label for="chatInput">Your Message:</label>
+          <input type="text" id="chatInput" placeholder="Type your message">
+          <button onclick="chatWithAi()">Send</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    let loggedUsername = "";
+    let userProfile = {};
+    let skillRadarChart = null;
+
+    // Show/hide dashboard sections based on menu selection
+    function showSection(sectionId) {
+      const sections = ["profileSection", "courseDetailsSection", "academicHistorySection",
+                        "recommendSection", "predictGradesSection", "skillChartSection", "chatSection"];
+      sections.forEach(id => {
+        document.getElementById(id).classList.add("hidden");
+      });
+      document.getElementById(sectionId).classList.remove("hidden");
+      // Update active menu
+      const menuItems = document.querySelectorAll(".sidebar-menu .menu-item");
+      menuItems.forEach(item => item.classList.remove("active"));
+      event.target.closest(".menu-item").classList.add("active");
+      if (sectionId === "academicHistorySection") {
+        populateHistorySemesters();
+      }
+    }
+
+    function showRegistration() {
+      document.getElementById("registrationSection").classList.remove("hidden");
+      document.getElementById("loginSection").classList.add("hidden");
+    }
+    
+    function showLogin() {
+      document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("registrationSection").classList.add("hidden");
+    }
+    
+    function registerUser() {
+      const username = document.getElementById("regUsername").value;
+      const password = document.getElementById("regPassword").value;
+      const name = document.getElementById("regName").value;
+      const age = document.getElementById("regAge").value;
+      const discipline = document.getElementById("regDiscipline").value;
+      const current_semester = document.getElementById("regSemester").value;
+      
+      fetch('/register', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, password, name, age, discipline, current_semester })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("regMessage").textContent = data.error;
+        } else {
+          loggedUsername = username;
+          userProfile = data.user;
+          document.getElementById("regMessage").textContent = "Registration successful.";
+          loadProfile();
+          // Hide auth section and show dashboard content
+          document.getElementById("authSection").classList.add("hidden");
+          document.getElementById("dashboardContent").classList.remove("hidden");
+        }
+      });
+    }
+    
+    function loginUser() {
+      const username = document.getElementById("loginUsername").value;
+      const password = document.getElementById("loginPassword").value;
+      
+      fetch('/login', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username, password })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("loginMessage").textContent = data.error;
+        } else {
+          loggedUsername = username;
+          userProfile = data.user;
+          document.getElementById("loginMessage").textContent = "";
+          loadProfile();
+          document.getElementById("authSection").classList.add("hidden");
+          document.getElementById("dashboardContent").classList.remove("hidden");
+        }
+      });
+    }
+    
+    // Called after login or registration to load profile details into form fields.
+    function loadProfile() {
+      document.getElementById("profileUsername").value = userProfile.username || "";
+      document.getElementById("profileName").value = userProfile.name || "";
+      document.getElementById("profileAge").value = userProfile.age || "";
+      document.getElementById("profileDiscipline").value = userProfile.discipline || "";
+      document.getElementById("profileSemester").value = userProfile.current_semester || "";
+      document.getElementById("profileCareerGoal").value = userProfile.career_goal || "";
+    }
+    
+    // Toggle edit mode: if editing, show Save/Cancel, disable Edit button.
+    function toggleEdit(editing) {
+      const inputs = document.querySelectorAll("#profileForm input:not([id='profileUsername'])");
+      inputs.forEach(input => input.disabled = !editing);
+      document.getElementById("editProfileBtn").classList.toggle("hidden", editing);
+      document.getElementById("saveProfileBtn").classList.toggle("hidden", !editing);
+      document.getElementById("cancelProfileBtn").classList.toggle("hidden", !editing);
+      if (!editing) {
+        // Reload original profile if cancelled.
+        loadProfile();
+        document.getElementById("profileMessage").textContent = "";
+      }
+    }
+    
+    // Called when Save is clicked – sends updated profile data to backend.
+    function updateProfile() {
+      const updatedData = {
+        username: document.getElementById("profileUsername").value,
+        name: document.getElementById("profileName").value,
+        age: document.getElementById("profileAge").value,
+        discipline: document.getElementById("profileDiscipline").value,
+        current_semester: document.getElementById("profileSemester").value,
+        career_goal: document.getElementById("profileCareerGoal").value
+      };
+      fetch('/update_profile', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify(updatedData)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if(data.error) {
+          document.getElementById("profileMessage").textContent = data.error;
+          document.getElementById("profileMessage").style.color = "red";
+        } else {
+          userProfile = data.user; // update global userProfile variable
+          document.getElementById("profileMessage").textContent = data.message;
+          document.getElementById("profileMessage").style.color = "green";
+          toggleEdit(false);
+        }
+      });
+    }
+    
+    function getCourses() {
+      const semester = document.getElementById("courseSemester").value;
+      // Use the discipline from the logged-in user profile
+      const discipline = userProfile.discipline;
+      fetch(`/get_courses?discipline=${encodeURIComponent(discipline)}&semester=${semester}`)
+        .then(response => response.json())
+        .then(data => {
+          let outputHTML = "";
+          if (data.error) {
+            outputHTML = `<p>${data.error}</p>`;
+          } else if (data.response) {
+            outputHTML = `<p>${data.response}</p>`;
+          } else if (Array.isArray(data) && data.length > 0) {
+            outputHTML += "<h3>Available Courses:</h3>";
+            data.forEach(course => {
+              // Use a small red dot if the course is mandatory.
+              const mandatoryDot = Number(course["Mandatory"]) >= 1 ? 
+                                    '<span class="mandatory-dot" title="Mandatory Course"></span>' : '';
+              outputHTML += `
+                <div class="course-card">
+                  <h4>${course["Course Code"]} - ${course["Course Title"]} ${mandatoryDot}</h4>
+                  <p><strong>Credits:</strong> ${course.Credits}</p>
+                  <p><strong>Hardness:</strong> ${course.Hardness}</p>
+                  <p>${course.Description}</p>
+                </div>
+              `;
+            });
+          } else {
+            outputHTML = "<p>No courses found.</p>";
+          }
+          document.getElementById("coursesOutput").innerHTML = outputHTML;
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("coursesOutput").innerHTML = "<p>Error fetching courses.</p>";
+        });
+    }
+    
+    function populateHistorySemesters() {
+      const currentSem = parseInt(userProfile.current_semester) || 1;
+      const addSemSelect = document.getElementById("addHistorySemester");
+      const filterSemSelect = document.getElementById("historySemester");
+      addSemSelect.innerHTML = "";
+      filterSemSelect.innerHTML = "";
+      // Allow only semesters less than current (assume current semester is not complete)
+      for (let i = 1; i < currentSem; i++) {
+        let optAdd = document.createElement("option");
+        optAdd.value = i;
+        optAdd.text = "Semester " + i;
+        addSemSelect.appendChild(optAdd);
+        
+        let optFilter = document.createElement("option");
+        optFilter.value = i;
+        optFilter.text = "Semester " + i;
+        filterSemSelect.appendChild(optFilter);
+      }
+      // Trigger default load for adding subjects in the add-history form:
+      if (addSemSelect.options.length > 0) {
+        addSemSelect.selectedIndex = 0;
+        loadSubjectsForAdd();
+        filterSemSelect.selectedIndex = 0;
+        loadHistory();
+      } else {
+        document.getElementById("historyDisplay").innerHTML = "<p>No previous semesters available.</p>";
+      }
+    }
+    
+    function loadSubjectsForAdd() {
+      const semester = document.getElementById("addHistorySemester").value;
+      // Assume the user’s discipline from their profile is used.
+      const discipline = userProfile.discipline;
+      fetch(`/get_courses?discipline=${encodeURIComponent(discipline)}&semester=${semester}`)
+        .then(response => response.json())
+        .then(data => {
+          const dropdown = document.getElementById("subjectDropdown");
+          dropdown.innerHTML = "";
+          if (Array.isArray(data) && data.length > 0) {
+            data.forEach(course => {
+              let option = document.createElement("option");
+              option.value = course["Course Code"];
+              option.text = `${course["Course Code"]} - ${course["Course Title"]}`;
+              dropdown.appendChild(option);
+            });
+          } else {
+            dropdown.innerHTML = "<option>No subjects found</option>";
+          }
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("subjectDropdown").innerHTML = "<option>Error loading subjects</option>";
+        });
+    }
+    
+    function addHistory() {
+      const semester = document.getElementById("addHistorySemester").value;
+      const subject_code = document.getElementById("subjectDropdown").value;
+      const grade = document.getElementById("subjectGrade").value;
+      const attendance = document.getElementById("subjectAttendance").value;
+      
+      const subjectData = {
+        subject_code: subject_code,
+        grade: grade,
+        attendance: attendance,
+        semester: semester
+      };
+      
+      fetch('/add_history', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username: loggedUsername, subject: subjectData })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.error) {
+          document.getElementById("historyOutput").innerHTML = `<p style="color:red;">${data.error}</p>`;
+        } else {
+          document.getElementById("historyOutput").innerHTML = `<p style="color:green;">Subject history updated.</p>`;
+          // Clear the grade and attendance fields.
+          document.getElementById("subjectGrade").value = "";
+          document.getElementById("subjectAttendance").value = "";
+          // Reload history display as well.
+          loadHistory();
+        }
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById("historyOutput").innerHTML = "<p style='color:red;'>Error updating history.</p>";
+      });
+    }
+    
+    function loadHistory() {
+      const selectedSemester = document.getElementById("historySemester").value;
+      fetch(`/get_history?username=${encodeURIComponent(loggedUsername)}`)
+        .then(response => response.json())
+        .then(data => {
+          // Filter records for the selected semester.
+          const semesterRecords = data.filter(record => record.semester == selectedSemester);
+          let historyHTML = "";
+          let totalCredits = 0;
+          let weightedGradeSum = 0;
+          if (semesterRecords.length > 0) {
+            historyHTML += `<h3>Academic Records: Semester ${selectedSemester}</h3><ul>`;
+            semesterRecords.forEach(rec => {
+              let credits = parseFloat(rec.credits) || 0;
+              let grade = parseFloat(rec.grade) || 0;
+              totalCredits += credits;
+              weightedGradeSum += (grade * credits);
+              historyHTML += `<li>
+                <strong>${rec.subject_code} - ${rec.course_title}</strong> (Credits: ${credits})  
+                | Grade: ${grade} | Attendance: ${rec.attendance}%
+              </li>`;
+            });
+            historyHTML += "</ul>";
+          } else {
+            historyHTML = `<p>No academic records found for Semester ${selectedSemester}.</p>`;
+          }
+          
+          // Calculate SGPA for that semester.
+          let sgpa = totalCredits > 0 ? (weightedGradeSum / totalCredits).toFixed(2) : "N/A";
+          let qualificationStatus = "";
+          if (totalCredits < 18) {
+            qualificationStatus = `<span style="color: red;">Not Qualified (Credits: ${totalCredits})</span>`;
+          } else {
+            qualificationStatus = `<span style="color: green;">Qualified (Credits: ${totalCredits})</span>`;
+          }
+          
+          historyHTML += `<p>SGPA: ${sgpa} | ${qualificationStatus}</p>`;
+          document.getElementById("historyDisplay").innerHTML = historyHTML;
+          
+          // Calculate overall CGPA from all records in previous semesters.
+          const previousRecords = data.filter(record => parseInt(record.semester) < parseInt(userProfile.current_semester));
+          let overallCredits = 0, overallWeightedSum = 0;
+          previousRecords.forEach(record => {
+            let c = parseFloat(record.credits) || 0;
+            let g = parseFloat(record.grade) || 0;
+            overallCredits += c;
+            overallWeightedSum += (g * c);
+          });
+          let cgpa = overallCredits > 0 ? (overallWeightedSum / overallCredits).toFixed(2) : "N/A";
+          document.getElementById("cgpaDisplay").innerHTML = `<h3>Overall CGPA (Semesters 1 - ${parseInt(userProfile.current_semester) - 1}): ${cgpa}</h3>`;
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("historyDisplay").innerHTML = "<p>Error loading academic history.</p>";
+        });
+    }
+    
+    function recommendCourses() {
+      const semester = document.getElementById("currentSemesterRec").value;
+      fetch('/recommend_courses', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ username: loggedUsername, semester })
+      })
+      .then(response => response.json())
+      .then(data => {
+        let outputHTML = "";
+        if (data.courses && data.courses.length > 0) {
+          outputHTML += "<h3>Recommended Courses:</h3>";
+          outputHTML += "<ul style='list-style: disc; padding-left: 20px;'>";
+          data.courses.forEach(course => {
+            outputHTML += `<li style="margin-bottom: 5px;">${course}</li>`;
+          });
+          outputHTML += "</ul>";
+        }
+        if (data.recommendation_explanation) {
+          outputHTML += "<h3>Recommendation Explanation:</h3>";
+          outputHTML += `<div style="padding:10px; border:1px solid #ccc; border-radius: 6px; background:#fff; margin-top:10px; line-height:1.4;">`;
+          let paragraphs = data.recommendation_explanation.split("\n\n");
+          paragraphs.forEach(p => {
+            if(p.trim().length > 0) {
+              outputHTML += `<p style="margin:10px 0;">${p}</p>`;
+            }
+          });
+          outputHTML += "</div>";
+        }
+        document.getElementById("recommendOutput").innerHTML = outputHTML;
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById("recommendOutput").innerHTML = "<p style='color: red;'>Error fetching recommendation.</p>";
+      });
+    }
+    
+    function predictGrades() {
+      const past = document.getElementById("pastPerformance").value;
+      const attendance = document.getElementById("attendance").value;
+      const difficulty = document.getElementById("difficulty").value;
+      fetch('/predict_grades', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ past_performance: past, attendance: attendance, course_difficulty: difficulty })
+      })
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById("gradeOutput").textContent = JSON.stringify(data, null, 2);
+      });
+    }
+    
+    function getSkillChart(forceReload = false) {
+      let url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}`;
+      if (forceReload) {
+        url += "&force=true";
+      }
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          if (data.error) {
+            document.getElementById("skillChartSection").innerHTML = `<p style="color:red;">${data.error}</p>`;
+            return;
+          }
+          
+          // Expecting a pure JSON object, e.g. { "Communication": 85, "Leadership": 78, ... }
+          const labels = Object.keys(data);
+          const ratings = Object.values(data);
+
+          // Get canvas context and destroy previous chart instance if exists
+          const ctx = document.getElementById("skillRadarChart").getContext("2d");
+          if (skillRadarChart) {
+            skillRadarChart.destroy();
+          }
+          skillRadarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+              labels: labels,
+              datasets: [{
+                label: 'Skill Ratings',
+                data: ratings,
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                pointBackgroundColor: 'rgba(155, 89, 182, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(155, 89, 182, 1)'
+              }]
+            },
+            options: {
+              scales: {
+                r: {
+                  angleLines: { color: '#ccc' },
+                  grid: { color: '#ccc' },
+                  suggestedMin: 0,
+                  suggestedMax: 100,
+                  pointLabels: { font: { size: 14 } }
+                }
+              },
+              plugins: {
+                legend: { display: true, position: 'top' }
+              }
+            }
+          });
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("skillChartSection").innerHTML = "<p style='color:red;'>Error generating skill chart.</p>";
+        });
+    }
+    
+    function chatWithAi() {
+      const message = document.getElementById("chatInput").value;
+      fetch('/chat_with_ai', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        const chatbox = document.getElementById("chatbox");
+        chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+        chatbox.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
+        document.getElementById("chatInput").value = '';
+      });
+    }
+    
+    // Populate the predictSemester dropdown with the current semester and future semesters.
+    function populatePredictSemesters() {
+      // Get the current semester from the user profile (e.g., from user.csv)
+      const currentSem = parseInt(userProfile.current_semester) || 1;
+      const predictSelect = document.getElementById("predictSemester");
+      predictSelect.innerHTML = "";
+      // Define the maximum future semester to include (adjust as necessary)
+      const maxFutureSem = currentSem + 7; // current + 2 future semesters
+      for (let i = currentSem; i <= maxFutureSem; i++) {
+        let option = document.createElement("option");
+        option.value = i;
+        option.text = "Semester " + i;
+        predictSelect.appendChild(option);
+      }
+      // Load academic data for the initial selection.
+      loadPredictData();
+    }
+    
+    // Load available academic data for the selected semester.
+    function loadPredictData() {
+      const selectedSem = document.getElementById("predictSemester").value;
+      fetch(`/get_history?username=${encodeURIComponent(loggedUsername)}`)
+        .then(response => response.json())
+        .then(data => {
+          // Filter records matching the selected semester.
+          const semRecords = data.filter(record => record.semester == selectedSem);
+          let outputHTML = "";
+          if (semRecords.length > 0) {
+            outputHTML += `<p>Found ${semRecords.length} record(s) for Semester ${selectedSem}.</p>`;
+            let totalCredits = 0, weightedSum = 0;
+            semRecords.forEach(rec => {
+              let credits = parseFloat(rec.credits) || 0;
+              let grade = parseFloat(rec.grade) || 0;
+              totalCredits += credits;
+              weightedSum += grade * credits;
+            });
+            let avgGrade = totalCredits > 0 ? (weightedSum / totalCredits).toFixed(2) : "N/A";
+            outputHTML += `<p>Average Grade for Semester ${selectedSem}: ${avgGrade}%</p>`;
+          } else {
+            outputHTML += `<p>No academic data found for Semester ${selectedSem}. Using most recent available data.</p>`;
+          }
+          document.getElementById("predictOutput").innerHTML = outputHTML;
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("predictOutput").innerHTML = "<p style='color:red;'>Error loading academic history for prediction.</p>";
+        });
+    }
+    
+    // Predict the needed grades by calling the /predict_grades endpoint.
+    function predictNeededGrade() {
+      const selectedSem = document.getElementById("predictSemester").value;
+      const target = document.getElementById("dreamGrade").value;
+      
+      fetch('/predict_grades', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ 
+           username: loggedUsername, 
+           semester: selectedSem, 
+           target_grade: target 
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        let formattedResult = `<h3>Prediction Results for Semester ${selectedSem}</h3>`;
+        formattedResult += `<pre style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:4px;">${data.predicted_grade_details}</pre>`;
+        document.getElementById("predictOutput").innerHTML = formattedResult;
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById("predictOutput").innerHTML = "<p style='color:red;'>Error predicting grades.</p>";
+      });
+    }
+    
+    window.addEventListener("load", populatePredictSemesters);
+  </script>
+</body>
+</html>
