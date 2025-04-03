@@ -224,6 +224,7 @@
         <li class="menu-item" onclick="showSection('predictGradesSection')"><span>Predict Grades</span></li>
         <li class="menu-item" onclick="showSection('skillChartSection')"><span>Skill Chart</span></li>
         <li class="menu-item" onclick="showSection('chatSection')"><span>Chat with AI</span></li>
+        <li class="menu-item" onclick="showSection('psychEvalSection')"><span>Psychological Evaluation</span></li>
       </ul>
     </div>
 
@@ -400,6 +401,21 @@
           <input type="text" id="chatInput" placeholder="Type your message">
           <button onclick="chatWithAi()">Send</button>
         </div>
+
+        <!-- Psychological Evaluation Section -->
+        <div id="psychEvalSection" class="section hidden">
+          <h2>Psychological Evaluation</h2>
+          <div id="psychEvalQuestion">
+            <p id="currentQuestion">Click "Start" to begin the evaluation.</p>
+            <button onclick="startPsychEval()">Start</button>
+          </div>
+          <div id="psychEvalForm" class="hidden">
+            <p id="currentQuestionText"></p>
+            <textarea id="currentAnswer" placeholder="Type your response here..." required></textarea>
+            <button onclick="submitPsychEvalAnswer()">Submit</button>
+          </div>
+          <div id="psychEvalOutput" style="margin-top: 15px;"></div>
+        </div>
       </div>
     </div>
   </div>
@@ -413,7 +429,7 @@
     // Show/hide dashboard sections based on menu selection
     function showSection(sectionId) {
       const sections = ["profileSection", "courseDetailsSection", "academicHistorySection",
-                        "recommendSection", "predictGradesSection", "skillChartSection", "chatSection"];
+                        "recommendSection", "predictGradesSection", "skillChartSection", "chatSection", "psychEvalSection"];
       sections.forEach(id => {
         document.getElementById(id).classList.add("hidden");
       });
@@ -932,6 +948,79 @@
       });
     }
     
+    let currentCriterionIndex = 0;
+    const criteria = [
+      "Analytical Thinking",
+      "Creativity",
+      "Logical Reasoning",
+      "Problem-Solving",
+      "Decision-Making",
+      "Emotional Resilience",
+      "Motivation",
+      "Curiosity",
+      "Attention to Detail",
+      "Communication Skills",
+      "Collaboration",
+      "Risk-Taking",
+      "Self-Discipline",
+      "Learning Style Preference",
+      "Adaptability"
+    ];
+
+    function startPsychEval() {
+      currentCriterionIndex = 0;
+      document.getElementById("psychEvalQuestion").classList.add("hidden");
+      document.getElementById("psychEvalForm").classList.remove("hidden");
+      fetchNextQuestion();
+    }
+
+    function fetchNextQuestion() {
+      if (currentCriterionIndex < criteria.length) {
+        const currentCriterion = criteria[currentCriterionIndex];
+        fetch('/psych_eval_question', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username: loggedUsername, current_criterion: currentCriterion })
+        })
+          .then(response => response.json())
+          .then(data => {
+            document.getElementById("currentQuestionText").textContent = data.question;
+          })
+          .catch(error => {
+            console.error(error);
+            document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error fetching question.</p>";
+          });
+      } else {
+        document.getElementById("psychEvalForm").classList.add("hidden");
+        document.getElementById("psychEvalOutput").innerHTML = "<p>Evaluation complete. Thank you!</p>";
+      }
+    }
+
+    function submitPsychEvalAnswer() {
+      const answer = document.getElementById("currentAnswer").value.trim();
+      if (!answer) {
+        alert("Please provide a response before submitting.");
+        return;
+      }
+
+      const currentCriterion = criteria[currentCriterionIndex];
+      fetch('/psych_eval_rank', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: loggedUsername, criterion: currentCriterion, response: answer })
+      })
+        .then(response => response.json())
+        .then(data => {
+          // Move to the next question without displaying the score
+          currentCriterionIndex++;
+          fetchNextQuestion();
+        })
+        .catch(error => {
+          console.error(error);
+          document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error recording response.</p>";
+        });
+    }
+
     window.addEventListener("load", populatePredictSemesters);
   </script>
 </body>

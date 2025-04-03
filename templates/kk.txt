@@ -1,8 +1,4 @@
-Analytical Thinking
-
-Creativity
-
-Logical Reasoning
+Analytical Thinking,Creativity,Logical Reasoning
 
 Problem-Solving
 

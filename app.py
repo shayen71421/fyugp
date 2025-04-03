@@ -476,6 +476,115 @@ def generate_skill_chart():
 
     return jsonify(skills)
 
+@app.route('/psych_eval_question', methods=['POST'])
+def get_psych_eval_question():
+    data = request.get_json()
+    username = data.get('username')
+    current_criterion = data.get('current_criterion')
+
+    if not username or not current_criterion:
+        return jsonify({"error": "Username and current criterion are required."}), 400
+
+    # Load user details from users.csv
+    user_details = {}
+    if os.path.exists('users.csv'):
+        with open('users.csv', 'r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    user_details = row
+                    break
+
+    if not user_details:
+        return jsonify({"error": "User not found."}), 404
+
+    # Generate a question dynamically based on user details and the current criterion
+    prompt = (
+        f"Generate a question to evaluate the user's {current_criterion}. "
+        f"The user is {user_details.get('age', 'unknown')} years old, studying {user_details.get('discipline', 'unknown')}, "
+        f"and is currently in semester {user_details.get('current_semester', 'unknown')}. "
+        f"The question should be specific to their background and relevant to {current_criterion}. "
+        f"Only return the question text without any additional explanation or context."
+    )
+
+    # Get the question from the AI
+    ai_response = get_groq_response(prompt)
+    question = ai_response.get("response", "No question available.")
+
+    return jsonify({"question": question})
+
+@app.route('/psych_eval_rank', methods=['POST'])
+def rank_psych_eval_response():
+    data = request.get_json()
+    username = data.get('username')
+    criterion = data.get('criterion')
+    response = data.get('response')
+
+    if not username or not criterion or not response:
+        return jsonify({"error": "Username, criterion, and response are required."}), 400
+
+    # Generate a ranking for the response
+    prompt = (
+        f"The user responded to the question about {criterion} with: '{response}'. "
+        "Rank the user's ability in this criterion on a scale of 1 to 100. "
+        "Only return the numeric score as a single number without any additional text or explanation."
+    )
+    ai_response = get_groq_response(prompt)
+    raw_score = ai_response.get("response", "0").strip()
+
+    # Extract only the numeric score
+    try:
+        score = int(raw_score)  # Ensure the score is a valid integer
+    except ValueError:
+        score = 0  # Default to 0 if the response is not a valid number
+
+    # Save the score to a CSV file
+    filename = 'psych_eval.csv'
+    file_exists = os.path.exists(filename)
+
+    # Read existing data to update the user's row
+    existing_data = {}
+    if file_exists:
+        with open(filename, mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                existing_data[row['username']] = row
+
+    # Update or create the user's row
+    if username not in existing_data:
+        existing_data[username] = {"username": username}
+    existing_data[username][criterion.lower().replace(" ", "_")] = score
+
+    # Write updated data back to the CSV file
+    with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
+        fieldnames = ['username'] + [c.lower().replace(" ", "_") for c in criteria]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+        writer.writeheader()
+        for user_data in existing_data.values():
+            writer.writerow(user_data)
+
+    # Do not return the score to the user
+    return jsonify({"message": "Response recorded successfully."})
+
+# Define the list of evaluation criteria
+criteria = [
+    "Analytical Thinking",
+    "Creativity",
+    "Logical Reasoning",
+    "Problem-Solving",
+    "Decision-Making",
+    "Emotional Resilience",
+    "Motivation",
+    "Curiosity",
+    "Attention to Detail",
+    "Communication Skills",
+    "Collaboration",
+    "Risk-Taking",
+    "Self-Discipline",
+    "Learning Style Preference",
+    "Adaptability"
+]
+
 def get_groq_response(user_input, language="english"):
     groq_api_key = "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"#paste api key here
     if not groq_api_key:
