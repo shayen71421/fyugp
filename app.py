@@ -404,27 +404,11 @@ def predict_grades():
 @app.route('/generate_skill_chart', methods=['GET'])
 def generate_skill_chart():
     username = request.args.get('username')
+
     if not username:
         return jsonify({"error": "Username is required."}), 400
 
-    # Check if the skill chart for this user is already saved
-    filename = 'skillcharts.csv'
-    saved_skills = None
-    if os.path.exists(filename):
-        with open(filename, mode='r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row.get('username') == username:
-                    try:
-                        saved_skills = json.loads(row.get('skills', '{}'))
-                    except Exception:
-                        saved_skills = {}
-                    break
-    if saved_skills:
-        # Return saved skills if available (do not re-generate)
-        return jsonify(saved_skills)
-
-    # No saved record – generate a new skill chart via Groq API.
+    # Load user details from users.csv
     users = load_users()
     if username not in users:
         return jsonify({"error": "User not found."}), 404
@@ -439,22 +423,71 @@ def generate_skill_chart():
         f"Current Semester: {user.get('current_semester')}, "
         f"Career Goal: {user.get('career_goal')}"
     )
-    # Updated prompt: instruct AI to output ONLY pure JSON (5 key skills and numeric ratings)
+
+    # Load psych_eval.csv data for the user
+    psych_eval_data = {}
+    if os.path.exists('psych_eval.csv'):
+        with open('psych_eval.csv', mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    psych_eval_data = row
+                    break
+
+    # Load history.csv data for the user
+    history_data = []
+    if os.path.exists('history.csv'):
+        with open('history.csv', mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    history_data.append(row)
+
+    # Build the prompt for the AI
     prompt = (
-        f"Based on the following user data: {user_data}. "
-        "Considering academic performance and factors for success, list exactly 5 key skills that the user needs to become successful. "
-        "For each skill, provide a numeric rating between 0 and 100 indicating the user's current strength in that area. "
-        "Return ONLY a JSON object with the skill names as keys and their numeric ratings as values, without any additional text."
+       f"Analyze the following student data and generate a skill assessment:\n\n"
+        f"1. Personal Information:\n"
+        f"- Age: {user.get('age')}\n"
+        f"- Discipline: {user.get('discipline')}\n"
+     
+        f"- Career Goal: {user.get('career_goal')}\n\n"
+        
+       
+        
+        f"3. Psychological Evaluation Scores:\n"
+        f"{json.dumps(psych_eval_data, indent=2)}\n\n"
+        
+        "Based on this comprehensive data, evaluate the student's proficiency in exactly 5 key skills "
+        "that are most relevant to their academic success and career goals. "
+        "Consider:\n"
+        "- Academic performance patterns\n"
+        "- Psychological evaluation results\n"
+        "- Career aspirations\n"
+       
+        
+        "Provide ratings between 0-100 for each skill, where:\n"
+        "0-20: Needs significant improvement\n"
+        "21-40: Below average\n"
+        "41-60: Average\n"
+        "61-80: Above average\n"
+        "81-100: Exceptional\n\n"
+        
+        "Return ONLY a JSON object with exactly 5 skill names as keys and their numeric ratings as values. "
+        "Choose the most relevant skills based on the available data. "
+        "Ensure the ratings accurately reflect the student's current abilities as demonstrated in their records."
+        "The skills must be the ones the studnet needs most in their life to be success\n"
+        "The prediction must be based on the data provided and not on any other information.\n"
+        "Focus on skills the user must improve to be successful in their life.\n"
     )
-    
+
     groq_response = get_groq_response(prompt)
     response_text = groq_response.get("response", "{}")
-    
-    # Try to parse the API response as JSON.
+
+    # Try to parse the API response as JSON
     try:
         skills = json.loads(response_text)
     except Exception as e:
-        # Attempt to extract a JSON object if extra text is present.
+        # Attempt to extract a JSON object if extra text is present
         start = response_text.find('{')
         end = response_text.rfind('}')
         if start != -1 and end != -1:
@@ -464,15 +497,26 @@ def generate_skill_chart():
                 skills = {"error": "Failed to parse JSON", "raw_response": response_text}
         else:
             skills = {"error": "No JSON object found", "raw_response": response_text}
-    
-    # Save the generated skills in CSV for future use.
+
+    # Save the generated skills in CSV for future use
+    filename = 'skillcharts.csv'
     file_exists = os.path.exists(filename)
     with open(filename, mode='a', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['username', 'skills']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
-        writer.writerow({"username": username, "skills": json.dumps(skills)})
+        # Overwrite the user's existing skill chart if it exists
+        rows = []
+        if file_exists:
+            with open(filename, mode='r', newline='', encoding='utf-8') as readfile:
+                rows = list(csv.DictReader(readfile))
+            rows = [row for row in rows if row['username'] != username]
+        rows.append({"username": username, "skills": json.dumps(skills)})
+        with open(filename, mode='w', newline='', encoding='utf-8') as writefile:
+            writer = csv.DictWriter(writefile, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(rows)
 
     return jsonify(skills)
 
@@ -503,7 +547,7 @@ def get_psych_eval_question():
         f"Generate a question to evaluate the user's {current_criterion}. "
         f"The user is {user_details.get('age', 'unknown')} years old, studying {user_details.get('discipline', 'unknown')}, "
         f"and is currently in semester {user_details.get('current_semester', 'unknown')}. "
-        f"The question should be specific to their background and relevant to {current_criterion}. "
+        f"The question should be short and specific to their background and relevant to {current_criterion} and musn't be too much focused on their discipline as this is a question for psychological evaluation. "
         f"Only return the question text without any additional explanation or context."
     )
 
@@ -616,7 +660,62 @@ def get_groq_response(user_input, language="english"):
 def chat_with_ai():
     data = request.get_json()
     user_message = data.get('message', '')
-    groq_response = get_groq_response(user_message)
+    username = data.get('username')
+
+    if not username:
+        return jsonify({"error": "Username is required"}), 400
+
+    # Load user details
+    users = load_users()
+    if username not in users:
+        return jsonify({"error": "User not found"}), 404
+    
+    user = users[username]
+
+    # Load psychological evaluation data
+    psych_eval_data = {}
+    if os.path.exists('psych_eval.csv'):
+        with open('psych_eval.csv', mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    psych_eval_data = row
+                    break
+
+    # Load academic history
+    history_data = []
+    if os.path.exists('history.csv'):
+        with open('history.csv', mode='r', newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                if row['username'] == username:
+                    history_data.append(row)
+
+    # Build context-aware prompt
+    prompt = (
+        f"You are an AI assistant created by EDUSYNC for helping a student. Here's the context about the student:\n\n"
+        f"Personal Information:\n"
+        f"- Age: {user.get('age')}\n"
+        f"- Discipline: {user.get('discipline')}\n"
+        f"- Current Semester: {user.get('current_semester')}\n"
+        f"- Career Goal: {user.get('career_goal')}\n\n"
+        
+        f"Psychological Profile:\n"
+        f"{json.dumps(psych_eval_data, indent=2)}\n\n"
+        
+        f"Consider the student's background, goals, and psychological profile while answering.\n"
+        f"Provide answers that are:\n"
+        f"1. Tailored to their academic level and discipline\n"
+        f"2. Aligned with their career goals\n"
+        f"3. Considerate of their psychological strengths and areas for improvement\n"
+        f"4. Encouraging and supportive\n"
+        f"5. Dont put ** and other unwanted symbols keep your answers short and precise\n\n"
+        
+        f"Student's Question: {user_message}\n\n"
+        f"Provide a helpful, personalized response:"
+    )
+
+    groq_response = get_groq_response(prompt)
     return jsonify(groq_response)
 
 @app.route('/')

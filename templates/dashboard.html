@@ -388,9 +388,8 @@
         <!-- Skill Chart Section -->
         <div id="skillChartSection" class="section hidden">
           <h2>Skill Chart</h2>
-          <button onclick="getSkillChart()">Generate Skill Chart</button>
-          <button onclick="getSkillChart(true)">Reload Skill Chart</button>
-          <canvas id="skillRadarChart" width="400" height="400"></canvas>
+          <button onclick="generateSkillChart()">Generate Skill Chart</button>
+          <canvas id="skillRadarChart"></canvas>
         </div>
         
         <!-- Chat with AI Section -->
@@ -424,7 +423,7 @@
   <script>
     let loggedUsername = "";
     let userProfile = {};
-    let skillRadarChart = null;
+    let skillRadarChart = null;  // Global variable for the chart instance
 
     // Show/hide dashboard sections based on menu selection
     function showSection(sectionId) {
@@ -799,10 +798,8 @@
     }
     
     function getSkillChart(forceReload = false) {
-      let url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}`;
-      if (forceReload) {
-        url += "&force=true";
-      }
+      const url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}${forceReload ? "&force=true" : ""}`;
+      
       fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -810,17 +807,25 @@
             document.getElementById("skillChartSection").innerHTML = `<p style="color:red;">${data.error}</p>`;
             return;
           }
-          
-          // Expecting a pure JSON object, e.g. { "Communication": 85, "Leadership": 78, ... }
+
+          // Ensure the data is a valid JSON object
+          if (typeof data !== "object" || Array.isArray(data)) {
+            document.getElementById("skillChartSection").innerHTML = `<p style="color:red;">Invalid data format received.</p>`;
+            return;
+          }
+
+          // Extract labels and values for the chart
           const labels = Object.keys(data);
           const ratings = Object.values(data);
 
           // Get canvas context and destroy previous chart instance if exists
           const ctx = document.getElementById("skillRadarChart").getContext("2d");
-          if (skillRadarChart) {
-            skillRadarChart.destroy();
+          if (window.skillRadarChart) {
+            window.skillRadarChart.destroy();
           }
-          skillRadarChart = new Chart(ctx, {
+
+          // Create the radar chart
+          window.skillRadarChart = new Chart(ctx, {
             type: 'radar',
             data: {
               labels: labels,
@@ -836,6 +841,7 @@
               }]
             },
             options: {
+              responsive: true,
               scales: {
                 r: {
                   angleLines: { color: '#ccc' },
@@ -852,24 +858,92 @@
           });
         })
         .catch(error => {
-          console.error(error);
+          console.error("Error generating skill chart:", error);
           document.getElementById("skillChartSection").innerHTML = "<p style='color:red;'>Error generating skill chart.</p>";
+        });
+    }
+    
+    function generateSkillChart() {
+      const url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}`;
+      
+      fetch(url)
+        .then(response => response.json())
+        .then(data => {
+          // Clear any existing error messages
+          document.getElementById("skillChartSection").innerHTML = `
+            <h2>Skill Chart</h2>
+            <button onclick="generateSkillChart()">Generate Skill Chart</button>
+            <canvas id="skillRadarChart"></canvas>
+          `;
+
+          // Get canvas context
+          const ctx = document.getElementById("skillRadarChart").getContext("2d");
+          
+          // Destroy existing chart if it exists
+          if (skillRadarChart) {
+            skillRadarChart.destroy();
+          }
+
+          // Create new chart
+          skillRadarChart = new Chart(ctx, {
+            type: 'radar',
+            data: {
+              labels: Object.keys(data),
+              datasets: [{
+                label: 'Skill Ratings',
+                data: Object.values(data),
+                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                borderColor: 'rgba(52, 152, 219, 1)',
+                pointBackgroundColor: 'rgba(155, 89, 182, 1)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgba(155, 89, 182, 1)'
+              }]
+            },
+            options: {
+              responsive: true,
+              maintainAspectRatio: true,
+              scales: {
+                r: {
+                  angleLines: { color: '#ccc' },
+                  grid: { color: '#ccc' },
+                  suggestedMin: 0,
+                  suggestedMax: 100,
+                  ticks: { stepSize: 20 }
+                }
+              },
+              plugins: {
+                legend: { display: true, position: 'top' }
+              }
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          document.getElementById("skillChartSection").innerHTML = `
+            <h2>Skill Chart</h2>
+            <button onclick="generateSkillChart()">Generate Skill Chart</button>
+            <p style="color: red;">Error generating skill chart. Please try again.</p>
+          `;
         });
     }
     
     function chatWithAi() {
       const message = document.getElementById("chatInput").value;
       fetch('/chat_with_ai', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ message })
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ 
+              message: message,
+              username: loggedUsername
+          })
       })
       .then(response => response.json())
       .then(data => {
-        const chatbox = document.getElementById("chatbox");
-        chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
-        chatbox.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
-        document.getElementById("chatInput").value = '';
+          const chatbox = document.getElementById("chatbox");
+          chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
+          chatbox.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
+          document.getElementById("chatInput").value = '';
       });
     }
     
@@ -1011,13 +1085,13 @@
       })
         .then(response => response.json())
         .then(data => {
-          // Move to the next question without displaying the score
+          
           currentCriterionIndex++;
           fetchNextQuestion();
         })
         .catch(error => {
           console.error(error);
-          document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error recording response.</p>";
+          document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error ranking response.</p>";
         });
     }
 
