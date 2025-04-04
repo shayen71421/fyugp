@@ -5,9 +5,7 @@ import os, csv, requests, json
 
 app = Flask(__name__, static_url_path='', static_folder='static', template_folder='templates')
 
-# ---------------------------
-# User Persistence Functions
-# ---------------------------
+
 def load_users():
     users = {}
     filename = 'users.csv'
@@ -29,9 +27,7 @@ def save_user(user_data):
             writer.writeheader()
         writer.writerow(user_data)
 
-# -------------------------------
-# Subject History Persistence
-# -------------------------------
+
 def save_history(history_record):
     filename = 'history.csv'
     file_exists = os.path.exists(filename)
@@ -42,9 +38,7 @@ def save_history(history_record):
             writer.writeheader()
         writer.writerow(history_record)
 
-# -------------------------------
-# Recommendation Persistence
-# -------------------------------
+
 def save_recommendation(rec):
     filename = 'recommendations.csv'
     file_exists = os.path.exists(filename)
@@ -55,9 +49,7 @@ def save_recommendation(rec):
             writer.writeheader()
         writer.writerow(rec)
 
-# ---------------
-# Load Courses
-# ---------------
+
 courses = pd.read_csv('courses.csv', comment='/', skipinitialspace=True)
 courses['Semester'] = pd.to_numeric(courses['Semester'], errors='coerce')
 courses['Credits'] = pd.to_numeric(courses['Credits'], errors='coerce')
@@ -72,9 +64,7 @@ def filter_courses(search_term, semester):
     ]
     return filtered
 
-# -------------------
-# Registration Endpoint
-# -------------------
+
 @app.route('/register', methods=['POST'])
 def register():
     data = request.get_json()
@@ -105,9 +95,7 @@ def register():
     save_user(user_data)
     return jsonify({"message": "Registration successful.", "user": user_data})
 
-# -------------------
-# Login Endpoint
-# -------------------
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -124,9 +112,7 @@ def login():
 
     return jsonify({"message": "Login successful.", "user": user})
 
-# ---------------------------
-# Add Academic History Endpoint
-# ---------------------------
+
 @app.route('/add_history', methods=['POST'])
 def add_history():
     data = request.get_json()
@@ -177,7 +163,7 @@ def get_history():
                     row["credits"] = "N/A"
                 records.append(row)
                 
-    # Clean records: convert None values to empty strings and numpy types to native types.
+    
     cleaned_records = []
     for record in records:
         cleaned_record = {}
@@ -192,9 +178,7 @@ def get_history():
         
     return jsonify(cleaned_records)
 
-# -------------------
-# Update Profile Endpoint
-# -------------------
+
 @app.route('/update_profile', methods=['POST'])
 def update_profile():
     data = request.get_json()
@@ -206,7 +190,7 @@ def update_profile():
     if username not in users:
         return jsonify({"error": "User not found."}), 404
 
-    # Update user info and include new 'career_goal' field
+    
     updated_user = {
         "username": username,
         "password": data.get('password', users[username].get('password')),
@@ -214,11 +198,11 @@ def update_profile():
         "age": data.get('age', users[username].get('age')),
         "discipline": data.get('discipline', users[username].get('discipline')),
         "current_semester": data.get('current_semester', users[username].get('current_semester')),
-        "career_goal": data.get('career_goal', users[username].get('career_goal', ""))  # new field
+        "career_goal": data.get('career_goal', users[username].get('career_goal', ""))  
     }
     users[username] = updated_user
 
-    # Write updated users back to CSV. Ensure CSV header now includes 'career_goal'
+    
     filename = 'users.csv'
     with open(filename, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['username', 'password', 'name', 'age', 'discipline', 'current_semester', 'career_goal']
@@ -229,9 +213,7 @@ def update_profile():
 
     return jsonify({"message": "Profile updated.", "user": updated_user})
 
-# -------------------
-# Other Endpoints...
-# -------------------
+
 @app.route('/get_courses', methods=['GET'])
 def get_courses():
     search_term = request.args.get('discipline', '')
@@ -244,11 +226,11 @@ def get_courses():
     
     result = filtered.to_dict(orient='records')
     for record in result:
-        # Pass CSV Hardness value as-is.
+        
         if "Hardness" not in record or not record["Hardness"]:
             record["Hardness"] = "N/A"
         
-        # Request a concise description (under 80 characters)
+        
         prompt = (
             f"Generate a concise description (under 80 characters) for the course: "
             f"{record['Course Code']} - {record['Course Title']}."
@@ -257,7 +239,7 @@ def get_courses():
         description = api_response.get("response", "").strip()
         if len(description) > 80:
             description = description[:80] + "..."
-        # Always assign a description – even if short.
+        
         record["Description"] = description if description else "Description not available."
     return jsonify(result)
 
@@ -272,7 +254,7 @@ def recommend_courses():
     if username not in users:
         return jsonify({"error": "User not found."}), 404
 
-    # Fetch user's discipline, career goal and current semester from CSV.
+    
     user = users[username]
     discipline = user.get('discipline', '')
     career_goal = user.get('career_goal', '')
@@ -281,18 +263,18 @@ def recommend_courses():
     except (ValueError, TypeError):
         current_semester = 0
 
-    # Obtain the requested recommendation semester from input.
+    
     input_semester = data.get('semester')
     try:
         input_semester = int(input_semester)
     except (ValueError, TypeError):
         return jsonify({"error": "Invalid semester input."}), 400
 
-    # Only generate recommendations for a semester earlier than the current one.
+    
     if input_semester < current_semester-1:
         return jsonify({"error": "Recommendation is only available for semesters prior to the current semester."}), 400
 
-    # Filter courses based on fetched discipline and the requested semester.
+    
     filtered = filter_courses(discipline, input_semester)
     if filtered.empty:
         return jsonify({"response": f"No courses found for {discipline} in semester {input_semester}."})
@@ -305,7 +287,7 @@ def recommend_courses():
         course_list.append(detail)
         courses_info += f"{detail}\n"
     
-    # Build the recommendation prompt.
+    
     prompt = (
         f"Given the following courses available in semester {input_semester} for {discipline}:\n"
         f"{courses_info}\n"
@@ -313,14 +295,14 @@ def recommend_courses():
         "Make sure to include all mandatory courses (label them as 'Mandatory') and ensure that the recommended courses total between 20 and 30 credits.\n"
         "Provide a concise one-line recommendation including only the course code, title, and a brief reason, indicating if a course is mandatory.\n"
     )
-    # Also include predicted grade if present.
+    
     predicted_grade = data.get('predicted_grade')
     if predicted_grade is not None:
         prompt += f" The student's predicted grade is {predicted_grade}%."
     
     groq_response = get_groq_response(prompt)
     
-    # Save only the required fields: username, semester and recommended courses.
+    
     recommendation_record = {
         "username": username,
         "semester": input_semester,
@@ -338,7 +320,7 @@ def predict_grades():
     data = request.get_json()
     username = data.get('username')
     selected_semester = data.get('semester')
-    target_grade = data.get('target_grade')  # expected as percentage, e.g., 85
+    target_grade = data.get('target_grade')  
 
     if not username or not selected_semester:
         return jsonify({"error": "Username and semester are required."}), 400
@@ -353,7 +335,7 @@ def predict_grades():
     except (ValueError, TypeError):
         target_grade = None
 
-    # Load all past academic records for the user from history.csv
+    
     history_records = []
     if os.path.exists("history.csv"):
         with open('history.csv', 'r', newline='', encoding='utf-8') as csvfile:
@@ -370,7 +352,7 @@ def predict_grades():
     else:
         history_summary += "No past academic records available.\n"
     
-    # Get recommended courses for the selected semester from recommendations.csv
+    
     recommended_courses = ""
     if os.path.exists("recommendations.csv"):
         with open('recommendations.csv', 'r', newline='', encoding='utf-8') as csvfile:
@@ -386,7 +368,7 @@ def predict_grades():
     if not recommended_courses:
         recommended_courses = "No recommended courses available for this semester."
 
-    # Build a concise predictive prompt for numeric output.
+    
     prompt = (
         f"Past Academic Records:\n{history_summary}\n"
         f"Recommended Courses for Semester {selected_semester}:\n{recommended_courses}\n"
@@ -408,13 +390,13 @@ def generate_skill_chart():
     if not username:
         return jsonify({"error": "Username is required."}), 400
 
-    # Load user details from users.csv
+    
     users = load_users()
     if username not in users:
         return jsonify({"error": "User not found."}), 404
 
     user = users[username]
-    # Build a string with user details from users.csv
+    
     user_data = (
         f"Username: {user.get('username')}, "
         f"Name: {user.get('name')}, "
@@ -424,7 +406,7 @@ def generate_skill_chart():
         f"Career Goal: {user.get('career_goal')}"
     )
 
-    # Load psych_eval.csv data for the user
+    
     psych_eval_data = {}
     if os.path.exists('psych_eval.csv'):
         with open('psych_eval.csv', mode='r', newline='', encoding='utf-8') as csvfile:
@@ -434,7 +416,7 @@ def generate_skill_chart():
                     psych_eval_data = row
                     break
 
-    # Load history.csv data for the user
+    
     history_data = []
     if os.path.exists('history.csv'):
         with open('history.csv', mode='r', newline='', encoding='utf-8') as csvfile:
@@ -443,7 +425,7 @@ def generate_skill_chart():
                 if row['username'] == username:
                     history_data.append(row)
 
-    # Build the prompt for the AI
+    
     prompt = (
        f"Analyze the following student data and generate a skill assessment:\n\n"
         f"1. Personal Information:\n"
@@ -461,7 +443,7 @@ def generate_skill_chart():
         "that are most relevant to their academic success and career goals. "
         "Consider:\n"
         "- Academic performance patterns\n"
-        "- Psychological evaluation results\n"
+        "- Psychological evaluation results which are out of 100\n"
         "- Career aspirations\n"
        
         
@@ -483,11 +465,11 @@ def generate_skill_chart():
     groq_response = get_groq_response(prompt)
     response_text = groq_response.get("response", "{}")
 
-    # Try to parse the API response as JSON
+    
     try:
         skills = json.loads(response_text)
     except Exception as e:
-        # Attempt to extract a JSON object if extra text is present
+        
         start = response_text.find('{')
         end = response_text.rfind('}')
         if start != -1 and end != -1:
@@ -498,7 +480,7 @@ def generate_skill_chart():
         else:
             skills = {"error": "No JSON object found", "raw_response": response_text}
 
-    # Save the generated skills in CSV for future use
+    
     filename = 'skillcharts.csv'
     file_exists = os.path.exists(filename)
     with open(filename, mode='a', newline='', encoding='utf-8') as csvfile:
@@ -506,7 +488,7 @@ def generate_skill_chart():
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         if not file_exists:
             writer.writeheader()
-        # Overwrite the user's existing skill chart if it exists
+        
         rows = []
         if file_exists:
             with open(filename, mode='r', newline='', encoding='utf-8') as readfile:
@@ -529,7 +511,7 @@ def get_psych_eval_question():
     if not username or not current_criterion:
         return jsonify({"error": "Username and current criterion are required."}), 400
 
-    # Load user details from users.csv
+    
     user_details = {}
     if os.path.exists('users.csv'):
         with open('users.csv', 'r', newline='', encoding='utf-8') as csvfile:
@@ -542,7 +524,7 @@ def get_psych_eval_question():
     if not user_details:
         return jsonify({"error": "User not found."}), 404
 
-    # Generate a question dynamically based on user details and the current criterion
+    
     prompt = (
         f"Generate a question to evaluate the user's {current_criterion}. "
         f"The user is {user_details.get('age', 'unknown')} years old, studying {user_details.get('discipline', 'unknown')}, "
@@ -551,7 +533,7 @@ def get_psych_eval_question():
         f"Only return the question text without any additional explanation or context."
     )
 
-    # Get the question from the AI
+    
     ai_response = get_groq_response(prompt)
     question = ai_response.get("response", "No question available.")
 
@@ -567,7 +549,7 @@ def rank_psych_eval_response():
     if not username or not criterion or not response:
         return jsonify({"error": "Username, criterion, and response are required."}), 400
 
-    # Generate a ranking for the response
+    
     prompt = (
         f"The user responded to the question about {criterion} with: '{response}'. "
         "Rank the user's ability in this criterion on a scale of 1 to 100. "
@@ -576,17 +558,17 @@ def rank_psych_eval_response():
     ai_response = get_groq_response(prompt)
     raw_score = ai_response.get("response", "0").strip()
 
-    # Extract only the numeric score
+    
     try:
-        score = int(raw_score)  # Ensure the score is a valid integer
+        score = int(raw_score)  
     except ValueError:
-        score = 0  # Default to 0 if the response is not a valid number
+        score = 0  
 
-    # Save the score to a CSV file
+    
     filename = 'psych_eval.csv'
     file_exists = os.path.exists(filename)
 
-    # Read existing data to update the user's row
+    
     existing_data = {}
     if file_exists:
         with open(filename, mode='r', newline='', encoding='utf-8') as csvfile:
@@ -594,12 +576,12 @@ def rank_psych_eval_response():
             for row in reader:
                 existing_data[row['username']] = row
 
-    # Update or create the user's row
+    
     if username not in existing_data:
         existing_data[username] = {"username": username}
     existing_data[username][criterion.lower().replace(" ", "_")] = score
 
-    # Write updated data back to the CSV file
+    
     with open(filename, mode='w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ['username'] + [c.lower().replace(" ", "_") for c in criteria]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -607,10 +589,10 @@ def rank_psych_eval_response():
         for user_data in existing_data.values():
             writer.writerow(user_data)
 
-    # Do not return the score to the user
+    
     return jsonify({"message": "Response recorded successfully."})
 
-# Define the list of evaluation criteria
+
 criteria = [
     "Analytical Thinking",
     "Creativity",
@@ -665,14 +647,14 @@ def chat_with_ai():
     if not username:
         return jsonify({"error": "Username is required"}), 400
 
-    # Load user details
+    
     users = load_users()
     if username not in users:
         return jsonify({"error": "User not found"}), 404
     
     user = users[username]
 
-    # Load psychological evaluation data
+    
     psych_eval_data = {}
     if os.path.exists('psych_eval.csv'):
         with open('psych_eval.csv', mode='r', newline='', encoding='utf-8') as csvfile:
@@ -682,7 +664,7 @@ def chat_with_ai():
                     psych_eval_data = row
                     break
 
-    # Load academic history
+    
     history_data = []
     if os.path.exists('history.csv'):
         with open('history.csv', mode='r', newline='', encoding='utf-8') as csvfile:
@@ -691,7 +673,7 @@ def chat_with_ai():
                 if row['username'] == username:
                     history_data.append(row)
 
-    # Build context-aware prompt
+    
     prompt = (
         f"You are an AI assistant created by EDUSYNC for helping a student. Here's the context about the student:\n\n"
         f"Personal Information:\n"
