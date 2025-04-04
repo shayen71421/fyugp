@@ -675,7 +675,7 @@ def chat_with_ai():
 
     
     prompt = (
-        f"You are an AI assistant created by EDUSYNC for helping a student. Here's the context about the student:\n\n"
+        f"You are an AI assistant created by EDUSYNC by the students of Sahrdaya College of Engineering and Technology for helping a student. Here's the context about the student:\n\n"
         f"Personal Information:\n"
         f"- Age: {user.get('age')}\n"
         f"- Discipline: {user.get('discipline')}\n"
