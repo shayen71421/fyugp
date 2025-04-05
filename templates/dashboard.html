@@ -882,27 +882,52 @@
               datasets: [{
                 label: 'Skill Ratings',
                 data: ratings,
-                backgroundColor: 'rgba(52, 152, 219, 0.2)',
-                borderColor: 'rgba(52, 152, 219, 1)',
-                pointBackgroundColor: 'rgba(155, 89, 182, 1)',
+                backgroundColor: 'rgba(52, 152, 219, 0.3)',  // Slightly more opaque
+                borderColor: 'rgba(52, 152, 219, 0.8)',      // More visible border
+                pointBackgroundColor: 'rgba(155, 89, 182, 0.8)',
                 pointBorderColor: '#fff',
                 pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(155, 89, 182, 1)'
+                pointHoverBorderColor: 'rgba(155, 89, 182, 1)',
+                borderWidth: 2,  // Slightly thicker border
+                pointRadius: 4   // Slightly larger points
               }]
             },
             options: {
               responsive: true,
               scales: {
                 r: {
-                  angleLines: { color: '#ccc' },
-                  grid: { color: '#ccc' },
+                  angleLines: { 
+                    color: 'rgba(204, 204, 204, 0.3)'  // Lighter angle lines
+                  },
+                  grid: { 
+                    color: 'rgba(204, 204, 204, 0.3)'  // Lighter grid lines
+                  },
                   suggestedMin: 0,
                   suggestedMax: 100,
-                  pointLabels: { font: { size: 14 } }
+                  ticks: {
+                    display: false  // Hide numerical values
+                  },
+                  pointLabels: { 
+                    font: { 
+                      size: 14,
+                      family: 'Arial',
+                      weight: '500'
+                    },
+                    color: '#2c3e50'  // Darker text color
+                  }
                 }
               },
               plugins: {
-                legend: { display: true, position: 'top' }
+                legend: { 
+                  display: true, 
+                  position: 'top',
+                  labels: {
+                    font: {
+                      size: 14,
+                      family: 'Arial'
+                    }
+                  }
+                }
               }
             }
           });
