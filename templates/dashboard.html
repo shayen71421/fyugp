@@ -762,7 +762,7 @@
       .then(data => {
         let outputHTML = "";
         if (data.courses && data.courses.length > 0) {
-          outputHTML += "<h3>Recommended Courses:</h3>";
+          outputHTML += "<h3>Available Courses:</h3>";
           outputHTML += "<ul style='list-style: disc; padding-left: 20px;'>";
           data.courses.forEach(course => {
             outputHTML += `<li style="margin-bottom: 5px;">${course}</li>`;
@@ -770,7 +770,7 @@
           outputHTML += "</ul>";
         }
         if (data.recommendation_explanation) {
-          outputHTML += "<h3>Recommendation Explanation:</h3>";
+          outputHTML += "<h3>Recommendation Courses:</h3>";
           outputHTML += `<div style="padding:10px; border:1px solid #ccc; border-radius: 6px; background:#fff; margin-top:10px; line-height:1.4;">`;
           let paragraphs = data.recommendation_explanation.split("\n\n");
           paragraphs.forEach(p => {
