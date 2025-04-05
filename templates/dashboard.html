@@ -6,12 +6,15 @@
   <title>EduSync - Student Dashboard</title>
   <style>
     :root {
-      --primary: #D4AF37; /* Gold */
-      --secondary: #1C1C1C; /* Dark background */
-      --dark: #000000; /* Black */
-      --light: #F5F5F5; /* Light grey for contrast */
-      --accent: #FFFFFF; /* White text */
-      --hover: #FFD700; /* Bright gold for hover effects */
+      --primary: #2c3e50;    /* Dark blue-gray */
+      --secondary: #f5f7fa;  /* Light gray background */
+      --dark: #1a252f;      /* Darker blue-gray */
+      --light: #ffffff;     /* White */
+      --accent: #3498db;    /* Blue accent */
+      --hover: #2980b9;     /* Darker blue for hover */
+      --text-primary: #2c3e50;
+      --text-secondary: #95a5a6;
+      --border: #ecf0f1;
     }
 
     * {
@@ -25,7 +28,7 @@
       display: flex;
       min-height: 100vh;
       background: var(--secondary);
-      color: var(--accent);
+      color: var(--text-primary);
     }
 
     .sidebar {
@@ -36,7 +39,7 @@
     }
 
     .sidebar h2 {
-      color: var(--primary);
+      color: var(--accent);
       text-align: center;
       margin-bottom: 2rem;
       font-family: 'Impact', sans-serif;
@@ -57,16 +60,17 @@
       cursor: pointer;
       transition: background 0.3s, color 0.3s;
       font-weight: bold;
+      color: var(--light);
     }
 
     .menu-item:hover {
       background: var(--hover);
-      color: var(--dark);
+      color: var(--light);
     }
 
     .menu-item.active {
-      background: var(--primary);
-      color: var(--dark);
+      background: var(--accent);
+      color: var(--light);
     }
 
     .menu-item span {
@@ -102,10 +106,12 @@
 
     .section {
       margin-bottom: 2rem;
-      background: var(--dark);
+      background: var(--light);
       padding: 1.5rem;
       border-radius: 8px;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
     }
 
     .section h2 {
@@ -127,16 +133,16 @@
       width: 100%;
       padding: 10px;
       margin-top: 5px;
-      border: 1px solid var(--primary);
+      border: 1px solid var(--border);
       border-radius: 4px;
-      background: var(--secondary);
-      color: var(--accent);
+      background: var(--light);
+      color: var(--text-primary);
     }
 
     .section button {
-      background: var(--primary);
+      background: var(--accent);
       border: none;
-      color: var(--dark);
+      color: var(--light);
       padding: 10px 20px;
       margin-top: 10px;
       border-radius: 4px;
@@ -150,48 +156,48 @@
     }
 
     pre {
-      background: var(--dark);
-      border: 1px solid var(--primary);
+      background: var(--secondary);
+      border: 1px solid var(--border);
       padding: 10px;
       border-radius: 4px;
       overflow-x: auto;
-      color: var(--accent);
+      color: var(--text-primary);
       white-space: pre-wrap;
       word-wrap: break-word;
     }
 
     #chatbox {
-      border: 1px solid var(--primary);
+      border: 1px solid var(--border);
       padding: 10px;
       height: 250px;
       overflow-y: auto;
-      background: var(--dark);
+      background: var(--light);
       border-radius: 4px;
       margin-top: 10px;
-      color: var(--accent);
+      color: var(--text-primary);
     }
 
     .course-card {
-      border: 1px solid var(--primary);
+      border: 1px solid var(--border);
       border-radius: 8px;
       padding: 10px;
       margin: 10px;
       display: inline-block;
       width: 250px;
-      background: var(--dark);
+      background: var(--light);
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
-      color: var(--accent);
+      color: var(--text-primary);
     }
 
     .course-card h4 {
       margin: 0.5rem 0;
-      color: var(--primary);
+      color: var(--accent);
       font-size: 1rem;
     }
 
     .course-card p {
       font-size: 0.9rem;
-      color: var(--accent);
+      color: var(--text-primary);
       margin: 0.3rem 0;
     }
 
@@ -199,7 +205,7 @@
       display: inline-block;
       width: 10px;
       height: 10px;
-      background-color: var(--primary);
+      background-color: var(--accent);
       border-radius: 50%;
       margin-left: 8px;
       vertical-align: middle;
