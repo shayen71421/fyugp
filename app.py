@@ -426,10 +426,10 @@ def generate_skill_chart():
     # Prompt for current skills assessment
     current_skills_prompt = (
         f"Based on the student's career goal: {user.get('career_goal')} and discipline: {user.get('discipline')},\n"
-        "generate ONLY a 5 skill JSON object with the same keys as provided in the current skill assessment.\n"
+        "generate ONLY a 5 skill JSON object with the same keys as provided in the current skill assessment after strict evaluation.\n"
         "For each skill, assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
         "Example (if current keys are \"Analytical Thinking\", \"Communication Skills\", \"Research Skills\", \"Teamwork\", \"Technical Writing\"):\n"
-        "{\"Analytical Thinking\": 85, \"Communication Skills\": 90, \"Research Skills\": 75, \"Teamwork\": 95, \"Technical Writing\": 80}"
+        "{\"Analytical Thinking\": 12, \"Communication Skills\": 34, \"Research Skills\": 55, \"Teamwork\": 43, \"Technical Writing\": 20}"
     )
 
     current_response = get_groq_response(current_skills_prompt)
@@ -445,7 +445,7 @@ def generate_skill_chart():
     required_skills_prompt = (
         f"Based on the student's career goal: {user.get('career_goal')} and discipline: {user.get('discipline')},\n"
         f"Using exactly these keys: {json.dumps(current_keys)}\n"
-        "generate ONLY a 5 skill JSON object for required skills where each key is identical and assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
+        "generate ONLY a 5 skill JSON object for required skills to reach his goal  where each key is identical and assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
         "Example: {\"Analytical Thinking\": 85, \"Communication Skills\": 90, \"Research Skills\": 75, \"Teamwork\": 95, \"Technical Writing\": 80}"
     )
 
