@@ -236,11 +236,12 @@
 
     <!-- Main Content -->
     <div class="main-content">
+      <!-- Update the header section -->
       <div class="header">
         <h1>Student Dashboard</h1>
-        <div class="user-profile">
+        <div class="user-profile" id="userProfileSection" style="display: none;">
           <img src="https://i.pravatar.cc/150" alt="User Avatar" class="user-avatar" id="user-avatar">
-          <span id="user-name">Guest</span>
+          <span id="user-name"></span>
         </div>
       </div>
       
@@ -483,6 +484,7 @@
           // Hide auth section and show dashboard content
           document.getElementById("authSection").classList.add("hidden");
           document.getElementById("dashboardContent").classList.remove("hidden");
+          document.getElementById("userProfileSection").style.display = "flex"; // Show user profile section
         }
       });
     }
@@ -507,6 +509,7 @@
           loadProfile();
           document.getElementById("authSection").classList.add("hidden");
           document.getElementById("dashboardContent").classList.remove("hidden");
+          document.getElementById("userProfileSection").style.display = "flex"; // Show user profile section
         }
       });
     }
@@ -519,6 +522,7 @@
       document.getElementById("profileDiscipline").value = userProfile.discipline || "";
       document.getElementById("profileSemester").value = userProfile.current_semester || "";
       document.getElementById("profileCareerGoal").value = userProfile.career_goal || "";
+      document.getElementById("user-name").textContent = userProfile.name || userProfile.username;
     }
     
     // Toggle edit mode: if editing, show Save/Cancel, disable Edit button.
