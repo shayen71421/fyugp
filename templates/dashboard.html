@@ -284,6 +284,7 @@
           <label for="regSemester">Current Semester:</label>
           <input type="number" id="regSemester" placeholder="Enter current semester">
           <button onclick="registerUser()">Register</button>
+          <button onclick="showAuthToggle()">Back</button>
           <p id="regMessage" style="color:red;"></p>
         </div>
         <div id="loginSection" class="hidden">
@@ -293,6 +294,7 @@
           <label for="loginPassword">Password:</label>
           <input type="password" id="loginPassword" placeholder="Enter password">
           <button onclick="loginUser()">Login</button>
+          <button onclick="showAuthToggle()">Back</button>
           <p id="loginMessage" style="color:red;"></p>
         </div>
       </div>
@@ -470,13 +472,22 @@
     function showRegistration() {
       document.getElementById("registrationSection").classList.remove("hidden");
       document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("authToggle").classList.add("hidden"); // Hide the auth toggle buttons
     }
     
     function showLogin() {
       document.getElementById("loginSection").classList.remove("hidden");
       document.getElementById("registrationSection").classList.add("hidden");
+      document.getElementById("authToggle").classList.add("hidden"); // Hide the auth toggle buttons
     }
     
+    // Add a new function to go back to auth toggle
+    function showAuthToggle() {
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("registrationSection").classList.add("hidden");
+      document.getElementById("authToggle").classList.remove("hidden");
+    }
+
     function registerUser() {
       const username = document.getElementById("regUsername").value;
       const password = document.getElementById("regPassword").value;
