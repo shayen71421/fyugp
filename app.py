@@ -702,19 +702,20 @@ def chat_with_ai():
         f"- Current Semester: {user.get('current_semester')}\n"
         f"- Career Goal: {user.get('career_goal')}\n\n"
         
-        f"Psychological Profile:\n"
+        f"Psychological Profile:(out of 100)\n"
         f"{json.dumps(psych_eval_data, indent=2)}\n\n"
         
         f"Consider the student's background, goals, and psychological profile while answering.\n"
         f"Provide answers that are:\n"
         f"1. Tailored to their academic level and discipline\n"
         f"2. Aligned with their career goals\n"
-        f"3. Considerate of their psychological strengths and areas for improvement\n"
+        f"3. Considerate of their psychological strengths and areas for improvement and also their negatives\n"
         f"4. Encouraging and supportive\n"
-        f"5. Dont put ** and other unwanted symbols keep your answers short and precise\n\n"
+        f"5. Dont put any text fromatters and other unwanted symbols keep your answers short and precise\n"
+        f"5. Dont hestitate to talk about the negatives of the user\n"
         
         f"Student's Question: {user_message}\n\n"
-        f"Provide a helpful, personalized response:"
+        f"Provide a helpful, personalized response while follwing all the rules:"
     )
 
     groq_response = get_groq_response(prompt)
