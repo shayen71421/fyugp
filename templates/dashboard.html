@@ -906,6 +906,12 @@
               }
             }
           });
+
+          // Add this CSS to control the canvas size
+          const canvas = document.getElementById("skillRadarChart");
+          canvas.style.maxWidth = '600px';  // Adjust this value to make it smaller
+          canvas.style.maxHeight = '600px'; // Adjust this value to make it smaller
+          canvas.style.margin = 'auto';     // Center the canvas
         })
         .catch(error => {
           console.error("Error generating skill chart:", error);
@@ -967,6 +973,12 @@
               }
             }
           });
+
+          // Add this CSS to control the canvas size
+          const canvas = document.getElementById("skillRadarChart");
+          canvas.style.maxWidth = '600px';  // Adjust this value to make it smaller
+          canvas.style.maxHeight = '600px'; // Adjust this value to make it smaller
+          canvas.style.margin = 'auto';     // Center the canvas
         })
         .catch(error => {
           console.error('Error:', error);
