@@ -406,17 +406,14 @@ def predict_grades():
 @app.route('/generate_skill_chart', methods=['GET'])
 def generate_skill_chart():
     username = request.args.get('username')
-
     if not username:
         return jsonify({"error": "Username is required."}), 400
 
-    
     users = load_users()
     if username not in users:
         return jsonify({"error": "User not found."}), 404
 
     user = users[username]
-    
     user_data = (
         f"Username: {user.get('username')}, "
         f"Name: {user.get('name')}, "
@@ -426,101 +423,64 @@ def generate_skill_chart():
         f"Career Goal: {user.get('career_goal')}"
     )
 
-    
-    psych_eval_data = {}
-    if os.path.exists('psych_eval.csv'):
-        with open('psych_eval.csv', mode='r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['username'] == username:
-                    psych_eval_data = row
-                    break
-
-    
-    history_data = []
-    if os.path.exists('history.csv'):
-        with open('history.csv', mode='r', newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                if row['username'] == username:
-                    history_data.append(row)
-
-    
-    prompt = (
-       f"Analyze the following student data and generate a skill assessment:\n\n"
-        f"1. Personal Information:\n"
-        f"- Age: {user.get('age')}\n"
-        f"- Discipline: {user.get('discipline')}\n"
-     
-        f"- Career Goal: {user.get('career_goal')}\n\n"
-        
-       
-        
-        f"3. Psychological Evaluation Scores:\n"
-        f"{json.dumps(psych_eval_data, indent=2)}\n\n"
-        
-        "Based on this comprehensive data, evaluate the student's proficiency in exactly 5 key skills "
-        "that are most relevant to their academic success and career goals. "
-        "Consider:\n"
-        "- Academic performance patterns\n"
-        "- Psychological evaluation results which are out of 100\n"
-        "- Career aspirations\n"
-       
-        
-        "Provide ratings between 0-100 for each skill, where:\n"
-        "0-20: Needs significant improvement\n"
-        "21-40: Below average\n"
-        "41-60: Average\n"
-        "61-80: Above average\n"
-        "81-100: Exceptional\n\n"
-        
-        "Return ONLY a JSON object with exactly 5 skill names as keys and their numeric ratings as values. "
-        "Choose the most relevant skills based on the available data. "
-        "Ensure the ratings accurately reflect the student's current abilities as demonstrated in their records."
-        "The skills must be the ones the studnet needs most in their life to be success\n"
-        "The prediction must be based on the data provided and not on any other information.\n"
-        "Focus on skills the user must improve to be successful in their life.\n"
+    # Prompt for current skills assessment
+    current_skills_prompt = (
+        f"Based on the student's career goal: {user.get('career_goal')} and discipline: {user.get('discipline')},\n"
+        "generate ONLY a 5 skill JSON object with the same keys as provided in the current skill assessment.\n"
+        "For each skill, assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
+        "Example (if current keys are \"Analytical Thinking\", \"Communication Skills\", \"Research Skills\", \"Teamwork\", \"Technical Writing\"):\n"
+        "{\"Analytical Thinking\": 85, \"Communication Skills\": 90, \"Research Skills\": 75, \"Teamwork\": 95, \"Technical Writing\": 80}"
     )
 
-    groq_response = get_groq_response(prompt)
-    response_text = groq_response.get("response", "{}")
-
-    
+    current_response = get_groq_response(current_skills_prompt)
     try:
-        skills = json.loads(response_text)
+        current_skills = json.loads(current_response.get("response", "{}").strip())
     except Exception as e:
-        
-        start = response_text.find('{')
-        end = response_text.rfind('}')
-        if start != -1 and end != -1:
-            try:
-                skills = json.loads(response_text[start:end+1])
-            except Exception as ex:
-                skills = {"error": "Failed to parse JSON", "raw_response": response_text}
-        else:
-            skills = {"error": "No JSON object found", "raw_response": response_text}
+        current_skills = {"error": "Failed to parse current skills JSON", "raw_response": current_response.get("response", "")}
 
-    
+    # Extract the keys from current skills to enforce same ones in required skills
+    current_keys = list(current_skills.keys()) if isinstance(current_skills, dict) and 'error' not in current_skills else []
+
+    # Prompt for required skills assessment using the same keys
+    required_skills_prompt = (
+        f"Based on the student's career goal: {user.get('career_goal')} and discipline: {user.get('discipline')},\n"
+        f"Using exactly these keys: {json.dumps(current_keys)}\n"
+        "generate ONLY a 5 skill JSON object for required skills where each key is identical and assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
+        "Example: {\"Analytical Thinking\": 85, \"Communication Skills\": 90, \"Research Skills\": 75, \"Teamwork\": 95, \"Technical Writing\": 80}"
+    )
+
+    required_response = get_groq_response(required_skills_prompt)
+    try:
+        required_skills = json.loads(required_response.get("response", "{}").strip())
+    except Exception as e:
+        required_skills = {"error": "Failed to parse required skills JSON", "raw_response": required_response.get("response", "")}
+
+    result = {
+        "current": current_skills,
+        "required": required_skills
+    }
+
+    # Save the dual skill chart data to CSV
     filename = 'skillcharts.csv'
     file_exists = os.path.exists(filename)
-    with open(filename, mode='a', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ['username', 'skills']
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        if not file_exists:
-            writer.writeheader()
-        
-        rows = []
-        if file_exists:
-            with open(filename, mode='r', newline='', encoding='utf-8') as readfile:
-                rows = list(csv.DictReader(readfile))
-            rows = [row for row in rows if row['username'] != username]
-        rows.append({"username": username, "skills": json.dumps(skills)})
-        with open(filename, mode='w', newline='', encoding='utf-8') as writefile:
-            writer = csv.DictWriter(writefile, fieldnames=fieldnames)
-            writer.writeheader()
-            writer.writerows(rows)
+    rows = []
+    if file_exists:
+        with open(filename, mode='r', newline='', encoding='utf-8') as readfile:
+            rows = list(csv.DictReader(readfile))
+        rows = [row for row in rows if row['username'] != username]
 
-    return jsonify(skills)
+    rows.append({
+        "username": username,
+        "skills": json.dumps(result)
+    })
+
+    with open(filename, mode='w', newline='', encoding='utf-8') as writefile:
+        fieldnames = ['username', 'skills']
+        writer = csv.DictWriter(writefile, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return jsonify(result)
 
 @app.route('/psych_eval_question', methods=['POST'])
 def get_psych_eval_question():
