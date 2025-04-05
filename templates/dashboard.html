@@ -765,23 +765,34 @@
       .then(response => response.json())
       .then(data => {
         let outputHTML = "";
-        if (data.courses && data.courses.length > 0) {
-          outputHTML += "<h3>Available Courses:</h3>";
-          outputHTML += "<ul style='list-style: disc; padding-left: 20px;'>";
-          data.courses.forEach(course => {
-            outputHTML += `<li style="margin-bottom: 5px;">${course}</li>`;
-          });
-          outputHTML += "</ul>";
-        }
         if (data.recommendation_explanation) {
-          outputHTML += "<h3>Recommendation Courses:</h3>";
-          outputHTML += `<div style="padding:10px; border:1px solid #ccc; border-radius: 6px; background:#fff; margin-top:10px; line-height:1.4;">`;
-          let paragraphs = data.recommendation_explanation.split("\n\n");
-          paragraphs.forEach(p => {
-            if(p.trim().length > 0) {
-              outputHTML += `<p style="margin:10px 0;">${p}</p>`;
-            }
-          });
+          outputHTML += "<div class='recommendation-container' style='padding:20px; border:1px solid #ccc; border-radius: 8px; background:#fff;'>";
+          
+          // Split sections by header
+          const sections = data.recommendation_explanation.split(/MANDATORY COURSES:|OPTIONAL COURSES:/);
+          const mandatoryCourses = sections[1]?.split('$').filter(line => line.trim());
+          const optionalCourses = sections[2]?.split('$').filter(line => line.trim());
+          
+          // Display Mandatory Courses
+          outputHTML += "<h3 style='color: var(--accent); margin-bottom: 15px;'>MANDATORY COURSES:</h3>";
+          if (mandatoryCourses && mandatoryCourses.length > 0) {
+            mandatoryCourses.forEach(course => {
+              if (course.trim()) {
+                outputHTML += `<div style='padding: 10px; margin: 5px 0; border: 1px solid #eee; border-radius: 4px;'>${course.trim()}</div>`;
+              }
+            });
+          }
+
+          // Display Optional Courses
+          outputHTML += "<h3 style='color: var(--accent); margin-top: 20px; margin-bottom: 15px;'>OPTIONAL COURSES:</h3>";
+          if (optionalCourses && optionalCourses.length > 0) {
+            optionalCourses.forEach(course => {
+              if (course.trim()) {
+                outputHTML += `<div style='padding: 10px; margin: 5px 0; border: 1px solid #eee; border-radius: 4px;'>${course.trim()}</div>`;
+              }
+            });
+          }
+          
           outputHTML += "</div>";
         }
         document.getElementById("recommendOutput").innerHTML = outputHTML;
