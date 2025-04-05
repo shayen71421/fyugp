@@ -386,12 +386,18 @@ def predict_grades():
     prompt = (
         f"Past Academic Records:\n{history_summary}\n"
         f"Recommended Courses for Semester {selected_semester}:\n{recommended_courses}\n"
-    )
-    if target_grade is not None:
-        prompt += f"Target Grade: {target_grade}%.\n"
-    prompt += (
-        "Return a table with three columns: Course Code, Predicted Grade (%) and Required Grade (%) "
-        "with numeric values only, without explanation or additional text."
+        f"{'Target Grade: ' + str(target_grade) + '%\n' if target_grade is not None else ''}"
+        "\n"
+        "+-------------+------------------+------------------+\n"
+        "| Course Code | Predicted Grade | Required Grade   |\n"
+        "+-------------+------------------+------------------+\n"
+        "Return a table in the exact format shown above, with:\n"
+        "1. Each row following the pattern: |{code:^11}|{predicted:^16}|{required:^16}|\n"
+        "2. Only include numeric values for grades (0-100)\n"
+        "3. End the table with: +-------------+------------------+------------------+\n"
+        "4. Align all values in the center of their columns\n"
+        "5. Include % symbol after each grade value\n"
+        "Example row: | CS101      |      85%        |      90%        |\n"
     )
     
     groq_response = get_groq_response(prompt)

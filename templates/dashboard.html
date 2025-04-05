@@ -1018,9 +1018,7 @@
       })
       .then(response => response.json())
       .then(data => {
-        let formattedResult = `<h3>Prediction Results for Semester ${selectedSem}</h3>`;
-        formattedResult += `<pre style="background:#f9f9f9; padding:10px; border:1px solid #ddd; border-radius:4px;">${data.predicted_grade_details}</pre>`;
-        document.getElementById("predictOutput").innerHTML = formattedResult;
+        displayPredictionResults(data);
       })
       .catch(err => {
         console.error(err);
@@ -1028,6 +1026,70 @@
       });
     }
     
+    function displayPredictionResults(data) {
+      const outputDiv = document.getElementById("predictOutput");
+      if (data.error) {
+          outputDiv.innerHTML = `<p class="error">${data.error}</p>`;
+          return;
+      }
+      
+      // Add custom styling for the table display
+      outputDiv.innerHTML = `
+          <div class="prediction-table">
+              <div class="table-container" style="
+                  font-family: 'Courier New', monospace;
+                  background: white;
+                  padding: 20px;
+                  border-radius: 8px;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                  overflow-x: auto;
+                  margin-top: 20px;
+              ">
+                  <table style="
+                      width: 100%;
+                      border-collapse: collapse;
+                      text-align: center;
+                  ">
+                      <thead>
+                          <tr>
+                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Course Code</th>
+                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Predicted Grade</th>
+                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Required Grade</th>
+                          </tr>
+                      </thead>
+                      <tbody>
+                          ${formatPredictionData(data.predicted_grade_details)}
+                      </tbody>
+                  </table>
+              </div>
+          </div>
+      `;
+  }
+  
+  function formatPredictionData(details) {
+      // Remove the ASCII table borders and split into lines
+      const lines = details.split('\n')
+          .filter(line => line.includes('|') && !line.includes('-+-'))
+          .map(line => line.trim())
+          .filter(line => line !== '');
+  
+      // Process each line into table rows
+      return lines.map(line => {
+          const [code, predicted, required] = line.split('|')
+              .map(cell => cell.trim())
+              .filter(cell => cell !== '');
+              
+          return `
+              <tr style="border-bottom: 1px solid #eee;">
+                  <td style="padding: 12px;">${code}</td>
+                  <td style="padding: 12px;">${predicted}</td>
+                  <td style="padding: 12px;">${required}</td>
+              </tr>
+          `;
+      }).join('');
+  }
+  
+
     let currentCriterionIndex = 0;
     const criteria = [
       "Analytical Thinking",
