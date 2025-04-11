@@ -429,7 +429,7 @@ def generate_skill_chart():
         "generate ONLY a 5 skill JSON object with the same keys as provided in the current skill assessment after strict evaluation.\n"
         "For each skill, assign the required minimum level (0-100) as a number. Do not include any explanation or additional characters.\n"
         "Example (if current keys are \"Analytical Thinking\", \"Communication Skills\", \"Research Skills\", \"Teamwork\", \"Technical Writing\"):\n"
-        "{\"Analytical Thinking\": 12, \"Communication Skills\": 34, \"Research Skills\": 55, \"Teamwork\": 43, \"Technical Writing\": 20}"
+        "{\"Analytical Thinking\": 12, \"Communication Skills\": 04, \"Research Skills\": 19, \"Teamwork\": 23, \"Technical Writing\": 20}"
     )
 
     current_response = get_groq_response(current_skills_prompt)
@@ -592,7 +592,7 @@ criteria = [
 ]
 
 def get_groq_response(user_input, language="english"):
-    groq_api_key = "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"#paste api key here
+    groq_api_key = "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"#paste api key here
     if not groq_api_key:
         return {"response": "API key not configured."}
     
