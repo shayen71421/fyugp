@@ -127,6 +127,7 @@ EDUSYNC proves that **AI can empower students** to make **data-driven academic d
 > Developed by the brilliant student innovators of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the guidance of ICT Academy of Kerala.
 
 ### 🔧 Core Team
+
 - [**shayen71421**](https://github.com/shayen71421-backend) – Backend Developer, AI Integration, Data Handling  
 - [**mishalshanavas**](https://github.com/mishalshanavas) – Database Management & Data Collection  
 - [**mathewgeejo**](https://github.com/mathewgeejo) – Frontend Design and Integration  
