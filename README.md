@@ -65,7 +65,7 @@
 
 ## 📂 Project Structure
 
-\`\`\`
+```
 ├── app.py                  # Main Flask application
 ├── templates/
 │   └── dashboard.html      # UI templates
@@ -76,37 +76,37 @@
 ├── recommendations.csv     # AI-generated course suggestions
 ├── skillcharts.csv         # Skill progress data
 ├── psych_eval.csv          # Psychometric scores
-\`\`\`
+```
 
 ---
 
 ## ⚙️ Setup Instructions
 
 1. Clone the repository:
-   \`\`\`bash
-   git clone https://github.com/YOUR_USERNAME/edusync-ai.git
+   ```bash
+   git clone https://github.com/shayen71421/fyugp.git
    cd edusync-ai
-   \`\`\`
+   ```
 
 2. Install dependencies:
-   \`\`\`bash
+   ```bash
    pip install flask pandas requests
-   \`\`\`
+   ```
 
-3. Configure your Groq API Key in \`app.py\`:
-   \`\`\`python
+3. Configure your Groq API Key in `app.py`:
+   ```python
    groq_api_key = "your_actual_key_here"
-   \`\`\`
+   ```
 
 4. Run the app:
-   \`\`\`bash
+   ```bash
    python app.py
-   \`\`\`
+   ```
 
 5. Open your browser and navigate to:
-   \`\`\`
+   ```
    http://localhost:5000/
-   \`\`\`
+   ```
 
 ---
 
@@ -118,13 +118,15 @@ EDUSYNC proves that **AI can empower students** to make **data-driven academic d
 
 ## 👥 Authors & Contributors
 
-> Developed by the brilliant student innovators of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the guidance of ICT Academy of Kerala.
+> Developed by the students of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the guidance of ICT Academy of Kerala.
 
 ### 🔧 Core Team
 
 - [**shayen71421**](https://github.com/shayen71421-backend) – Backend Developer, AI Integration, Data Handling  
 - [**mishalshanavas**](https://github.com/mishalshanavas) – Database Management & Data Collection  
 - [**mathewgeejo**](https://github.com/mathewgeejo) – Frontend Design and Integration  
+
+---
 
 ## 📝 License
 
