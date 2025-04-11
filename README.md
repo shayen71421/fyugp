@@ -110,12 +110,6 @@
 
 ---
 
-## 💫 Authors
-
-> Built with passion by the student innovators of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the mentorship of our faculty and the vision of ICT Academy of Kerala.
-
----
-
 ## 🧠 FYUGP + GenAI = Future of Education
 
 EDUSYNC proves that **AI can empower students** to make **data-driven academic decisions**, improve mental well-being, and **thrive in a personalized learning ecosystem** — aligning perfectly with the vision of **FYUGP and NEP 2020**.
