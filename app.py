@@ -592,7 +592,7 @@ criteria = [
 ]
 
 def get_groq_response(user_input, language="english"):
-    groq_api_key = "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"#paste api key here
+    groq_api_key = ""#paste api key here
     if not groq_api_key:
         return {"response": "API key not configured."}
     
