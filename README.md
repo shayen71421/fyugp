@@ -83,8 +83,8 @@
 ## ⚙️ Setup Instructions
 
 1. Clone the repository:
-   \`\`\`bash
-   git clone https://github.com/YOUR_USERNAME/edusync-ai.git
+   ```bash
+   git clone https://github.com/shayen71421/fyugp.git
    cd edusync-ai
    ```
 
@@ -118,7 +118,7 @@ EDUSYNC proves that **AI can empower students** to make **data-driven academic d
 
 ## 👥 Authors & Contributors
 
-> Developed by the students of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the guidance of ICT Academy of Kerala.
+> Developed by the brilliant student innovators of **Sahrdaya College of Engineering and Technology** for **Techathlon 2024-25** under the guidance of ICT Academy of Kerala.
 
 ### 🔧 Core Team
 
