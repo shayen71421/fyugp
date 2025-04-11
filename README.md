@@ -124,7 +124,7 @@ Developed by the students of **Sahrdaya College of Engineering and Technology** 
 
 - [**shayen71421**](https://github.com/shayen71421-backend) – Backend Developer, AI Integration, Data Handling  
 - [**mishalshanavas**](https://github.com/mishalshanavas) – Database Management & Data Collection  
-- [**mathewgeejo**](https://github.com/mathewgeejo) – Frontend Design and Integration  
+- [**mathewgeejo**](https://github.com/mathewgeejo) – Frontend Design & UI/UX
 
 ---
 
