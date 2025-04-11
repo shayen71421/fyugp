@@ -83,7 +83,7 @@
 ## ⚙️ Setup Instructions
 
 1. Clone the repository:
-   \`\`\`bash
+   bash
    git clone https://github.com/YOUR_USERNAME/edusync-ai.git
    cd edusync-ai
    \`\`\`
