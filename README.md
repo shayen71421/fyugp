@@ -128,6 +128,4 @@ Developed by the students of **Sahrdaya College of Engineering and Technology** 
 
 ---
 
-## 📝 License
-
-MIT License. Feel free to fork, contribute, and enhance 🚀
+git add .
