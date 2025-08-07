@@ -1,1358 +1,1684 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EduSync - Student Dashboard</title>
-  <style>
-    :root {
-      --primary: #212121;   /* YouTube dark background */
-      --secondary: #ffffff;  /* White background */
-      --dark: #0f0f0f;      /* YouTube darker shade */
-      --light: #ffffff;     /* White */
-      --accent: #1988c9;    /* LinkedIn blue */
-      --hover: #116ba6;     /* Darker blue for hover */
-      --text-primary: #030303;  /* Text black */
-      --text-secondary: #606060; /* Secondary text */
-      --border: #e5e5e5;    /* Border color */
-      --background: #f9f9f9; /* Light background */
-      --shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-      --card-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUSYNC - Academic Intelligence Platform</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Arial', sans-serif;
-    }
+        :root {
+            --primary-black: #000000;
+            --secondary-black: #1a1a1a;
+            --tertiary-black: #2d2d2d;
+            --accent-gray: #404040;
+            --light-gray: #666666;
+            --lighter-gray: #888888;
+            --bg-gray: #f8f8f8;
+            --white: #ffffff;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --border: rgba(0, 0, 0, 0.08);
+        }
 
-    body {
-      background: var(--background);
-    }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-gray);
+            color: var(--primary-black);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
 
-    .dashboard {
-      display: flex;
-      min-height: 100vh;
-      background: #f8f9fa;
-      color: var(--text-primary);
-    }
+        /* Header */
+        .header {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
 
-    .sidebar {
-      width: 280px;
-      background: var(--primary);
-      padding: 2rem;
-      box-shadow: var(--card-shadow);
-    }
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-    .sidebar h2 {
-      color: white;
-      text-align: center;
-      margin-bottom: 2.5rem;
-      font-family: 'Poppins', sans-serif;
-      font-size: 2.2rem;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
-    }
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-black);
+            text-decoration: none;
+            letter-spacing: -0.02em;
+        }
 
-    .sidebar-menu {
-      list-style: none;
-      padding: 0;
-    }
+        .logo i {
+            margin-right: 0.5rem;
+            color: var(--light-gray);
+        }
 
-    .menu-item {
-      display: flex;
-      align-items: center;
-      padding: 0.8rem 1.2rem;
-      margin: 2px 0;
-      border-radius: 10px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      font-weight: bold;
-      color: var(--light);
-      background: transparent;
-      border-left: 3px solid transparent;
-    }
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
 
-    .menu-item:hover {
-      background: rgba(255, 255, 255, 0.1);
-      transform: translateX(3px);
-      border-left: 3px solid var(--accent);
-    }
+        .nav-btn {
+            background: var(--primary-black);
+            color: var(--white);
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
 
-    .menu-item.active {
-      background: rgba(255, 255, 255, 0.2);
-      color: var(--accent);
-    }
+        .nav-btn:hover {
+            background: var(--secondary-black);
+            transform: translateY(-1px);
+        }
 
-    .menu-item span {
-      margin-left: 1rem;
-    }
+        .nav-btn.secondary {
+            background: transparent;
+            color: var(--primary-black);
+            border: 1px solid var(--border);
+        }
 
-    .main-content {
-      flex: 1;
-      padding: 2rem;
-      background: var(--secondary);
-      color: var(--accent);
-    }
+        .nav-btn.secondary:hover {
+            background: var(--primary-black);
+            color: var(--white);
+        }
 
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 2rem;
-      background: var(--secondary);
-      padding: 1.5rem 2rem;
-      border-radius: 16px;
-      box-shadow: var(--shadow);
-      border-bottom: 1px solid var(--border);
-    }
+        /* Main Layout */
+        .main-container {
+            display: flex;
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
 
-    .user-profile {
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-      background: var(--background);
-      padding: 0.8rem 1.5rem;
-      border-radius: 40px;
-      border: 1px solid var(--border);
-    }
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--white);
+            border-right: 1px solid var(--border);
+            padding: 2rem 0;
+            position: fixed;
+            height: calc(100vh - 80px);
+            overflow-y: auto;
+        }
 
-    .user-avatar {
-      width: 45px;
-      height: 45px;
-      border-radius: 50%;
-      border: 3px solid var(--accent);
-      box-shadow: 0 0 0 3px rgba(25, 136, 201, 0.1);
-    }
+        .sidebar-nav {
+            list-style: none;
+        }
 
-    .section {
-      margin-bottom: 2rem;
-      background: var(--secondary);
-      padding: 2rem;
-      border-radius: 12px;
-      box-shadow: var(--shadow);
-      color: var(--text-primary);
-      border: 1px solid var(--border);
-      transition: all 0.3s ease;
-    }
+        .sidebar-nav li {
+            margin: 0.25rem 0;
+        }
 
-    .section:hover {
-      box-shadow: var(--card-shadow);
-    }
+        .sidebar-nav button {
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 1rem 2rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--light-gray);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
 
-    .section h2 {
-      color: var(--text-primary);
-      margin-bottom: 1.5rem;
-      font-weight: 400;  /* Regular weight instead of bold */
-      font-size: 1.5rem;
-      letter-spacing: 0.5px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.5rem;
-    }
+        .sidebar-nav button:hover {
+            background: var(--bg-gray);
+            color: var(--primary-black);
+        }
 
-    .section h3 {
-      color: var (--text-primary);
-      font-weight: 400;  /* Regular weight */
-      font-size: 1.2rem;
-      margin: 1rem 0;
-    }
+        .sidebar-nav button.active {
+            background: var(--primary-black);
+            color: var(--white);
+            position: relative;
+        }
 
-    #recommendSection h2 {
-      font-weight: 400;  /* Regular weight */
-      color: var(--text-primary);
-      font-size: 1.5rem;
-      margin-bottom: 1.5rem;
-    }
+        .sidebar-nav button.active::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: var(--primary-black);
+        }
 
-    .section label {
-      display: block;
-      margin-top: 10px;
-      font-weight: bold;
-      color: var(--accent);
-    }
+        .sidebar-nav i {
+            width: 18px;
+            text-align: center;
+        }
 
-    .section input,
-    .section textarea,
-    .section select {
-      width: 100%;
-      padding: 10px;
-      margin-top: 5px;
-      border: 2px solid var(--border);
-      border-radius: 4px;
-      background: var(--background);
-      color: var(--text-primary);
-      transition: all 0.2s ease;
-    }
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            margin-left: 280px;
+            padding: 2rem;
+            max-width: calc(100vw - 280px);
+        }
 
-    .section input:focus,
-    .section textarea:focus,
-    .section select:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(25, 136, 201, 0.1);
-      outline: none;
-    }
+        .content-container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
 
-    .section button {
-      background: var(--accent);
-      border: none;
-      color: var(--light);
-      padding: 12px 24px;
-      margin-top: 10px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-weight: 500;
-      letter-spacing: 0.5px;
-    }
+        /* Section Styles */
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
 
-    .section button:hover {
-      background: var(--hover);
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(25, 136, 201, 0.2);
-    }
+        .section.active {
+            display: block;
+        }
 
-    pre {
-      background: var(--secondary);
-      border: 1px solid var(--border);
-      padding: 10px;
-      border-radius: 4px;
-      overflow-x: auto;
-      color: var (--text-primary);
-      white-space: pre-wrap;
-      word-wrap: break-word;
-    }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-    #chatbox {
-      border: 1px solid var(--border);
-      padding: 10px;
-      height: 250px;
-      overflow-y: auto;
-      background: var(--light);
-      border-radius: 4px;
-      margin-top: 10px;
-      color: var(--text-primary);
-    }
+        /* Cards */
+        .card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 1px 3px var(--shadow);
+        }
 
-    .course-card {
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 1.5rem;
-      margin: 1rem;
-      display: inline-block;
-      width: 250px;
-      background: var(--secondary);
-      box-shadow: var(--shadow);
-      color: var(--text-primary);
-      transition: transform 0.2s;
-      border-left: 4px solid var(--accent);
-    }
+        .card-header {
+            margin-bottom: 1.5rem;
+        }
 
-    .course-card:hover {
-      transform: translateY(-2px);
-      box-shadow: var(--card-shadow);
-    }
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-black);
+            margin-bottom: 0.5rem;
+        }
 
-    .course-card h4 {
-      margin: 0.5rem 0;
-      color: var(--accent);
-      font-size: 1rem;
-    }
+        .card-subtitle {
+            color: var(--light-gray);
+            font-size: 0.875rem;
+        }
 
-    .course-card p {
-      font-size: 0.9rem;
-      color: var(--text-primary);
-      margin: 0.3rem 0;
-    }
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
 
-    .mandatory-dot {
-      display: inline-block;
-      width: 10px;
-      height: 10px;
-      background-color: var(--accent);
-      border-radius: 50%;
-      margin-left: 8px;
-      vertical-align: middle;
-    }
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--primary-black);
+            font-size: 0.875rem;
+        }
 
-    .hidden {
-      display: none;
-    }
+        .form-input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 0.875rem;
+            background: var(--white);
+            color: var(--primary-black);
+            transition: all 0.2s ease;
+        }
 
-    /* Add scrollbar styling */
-    ::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
-    }
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary-black);
+            box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.1);
+        }
 
-    ::-webkit-scrollbar-track {
-      background: var(--background);
-      border-radius: 4px;
-    }
+        .form-input::placeholder {
+            color: var(--lighter-gray);
+        }
 
-    ::-webkit-scrollbar-thumb {
-      background: var(--accent);
-      border-radius: 4px;
-    }
+        select.form-input {
+            cursor: pointer;
+        }
 
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--hover);
-    }
-  </style>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        textarea.form-input {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Buttons */
+        .btn {
+            background: var(--primary-black);
+            color: var(--white);
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: var(--secondary-black);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px var(--shadow);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: transparent;
+            color: var(--primary-black);
+            border: 1px solid var(--border);
+        }
+
+        .btn.secondary:hover {
+            background: var(--bg-gray);
+        }
+
+        .btn.danger {
+            background: var(--tertiary-black);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Grid System */
+        .grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .grid-2 {
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+
+        .grid-3 {
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--white);
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            background: var(--bg-gray);
+            font-weight: 600;
+            color: var(--primary-black);
+            font-size: 0.875rem;
+        }
+
+        .table td {
+            font-size: 0.875rem;
+            color: var(--light-gray);
+        }
+
+        .table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-black);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--light-gray);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        /* Chat Interface */
+        .chat-container {
+            height: 500px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            background: var(--white);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            background: var(--bg-gray);
+        }
+
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input {
+            flex: 1;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            background: var(--primary-black);
+            color: var(--white);
+            margin-left: auto;
+        }
+
+        .message.ai {
+            background: var(--white);
+            border: 1px solid var(--border);
+        }
+
+        /* Loading States */
+        .loading {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--light-gray);
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--border);
+            border-top-color: var(--primary-black);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Alerts */
+        .alert {
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            font-size: 0.875rem;
+        }
+
+        .alert.success {
+            background: rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border);
+            color: var(--primary-black);
+        }
+
+        .alert.error {
+            background: rgba(0, 0, 0, 0.1);
+            border: 1px solid var(--tertiary-black);
+            color: var(--primary-black);
+        }
+
+        /* Welcome Section */
+        .welcome-banner {
+            background: linear-gradient(135deg, var(--primary-black) 0%, var(--secondary-black) 100%);
+            color: var(--white);
+            padding: 3rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .welcome-subtitle {
+            font-size: 1.125rem;
+            opacity: 0.8;
+            margin-bottom: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                transform: translateX(0);
+            }
+
+            .content-area {
+                margin-left: 0;
+                max-width: 100vw;
+                padding: 1rem;
+            }
+
+            .header-content {
+                padding: 0 1rem;
+            }
+
+            .welcome-title {
+                font-size: 2rem;
+            }
+
+            .grid-2,
+            .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Utility Classes */
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+        .mt-1 { margin-top: 0.5rem; }
+        .mt-2 { margin-top: 1rem; }
+        .mb-1 { margin-bottom: 0.5rem; }
+        .mb-2 { margin-bottom: 1rem; }
+        .hidden { display: none; }
+        .flex { display: flex; }
+        .justify-between { justify-content: space-between; }
+        .items-center { align-items: center; }
+        .gap-1 { gap: 0.5rem; }
+        .gap-2 { gap: 1rem; }
+    </style>
 </head>
 <body>
-  <div class="dashboard">
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <h2>EduSync</h2>
-      <ul class="sidebar-menu" id="sidebar-menu">
-        <li class="menu-item active" onclick="showSection('profileSection')"><span>Profile</span></li>
-        <li class="menu-item" onclick="showSection('psychEvalSection')"><span>Psychological Evaluation</span></li>
-        <li class="menu-item" onclick="showSection('academicHistorySection')"><span>Academic History</span></li>
-        <li class="menu-item" onclick="showSection('courseDetailsSection')"><span>Courses</span></li>
-        <li class="menu-item" onclick="showSection('recommendSection')"><span>Recommendations</span></li>
-        <li class="menu-item" onclick="showSection('predictGradesSection')"><span>Predict Grades</span></li>
-        <li class="menu-item" onclick="showSection('skillChartSection')"><span>Skill Chart</span></li>
-        <li class="menu-item" onclick="showSection('chatSection')"><span>Chat with AI</span></li>
-        
-      </ul>
-    </div>
-
-    <!-- Main Content -->
-    <div class="main-content">
-      <!-- Update the header section -->
-      <div class="header">
-        <h1>Student Dashboard</h1>
-        <div class="user-profile" id="userProfileSection" style="display: none;">
-          <img src="https://i.pravatar.cc/150" alt="User Avatar" class="user-avatar" id="user-avatar">
-          <span id="user-name"></span>
-        </div>
-      </div>
-      
-      <!-- Registration/Login Modal (shown if not logged in) -->
-      <div id="authSection" class="section">
-        <div id="authToggle">
-          <button onclick="showRegistration()">Register</button>
-          <button onclick="showLogin()">Login</button>
-        </div>
-        <div id="registrationSection" class="hidden">
-          <h2>Sign Up</h2>
-          <label for="regUsername">Username:</label>
-          <input type="text" id="regUsername" placeholder="Choose a username">
-          <label for="regPassword">Password:</label>
-          <input type="password" id="regPassword" placeholder="Choose a password">
-          <label for="regName">Name:</label>
-          <input type="text" id="regName" placeholder="Your full name">
-          <label for="regAge">Age:</label>
-          <input type="number" id="regAge" placeholder="Your age">
-          <label for="regDiscipline">Discipline:</label>
-          <input type="text" id="regDiscipline" placeholder="e.g., Zoology">
-          <label for="regSemester">Current Semester:</label>
-          <input type="number" id="regSemester" placeholder="Enter current semester">
-          <button onclick="registerUser()">Register</button>
-          <button onclick="showAuthToggle()">Back</button>
-          <p id="regMessage" style="color:red;"></p>
-        </div>
-        <div id="loginSection" class="hidden">
-          <h2>User Login</h2>
-          <label for="loginUsername">Username:</label>
-          <input type="text" id="loginUsername" placeholder="Enter username">
-          <label for="loginPassword">Password:</label>
-          <input type="password" id="loginPassword" placeholder="Enter password">
-          <button onclick="loginUser()">Login</button>
-          <button onclick="showAuthToggle()">Back</button>
-          <p id="loginMessage" style="color:red;"></p>
-        </div>
-      </div>
-      
-      <!-- Dashboard Content Sections (hidden until logged in) -->
-      <div id="dashboardContent" class="hidden">
-        <!-- Profile Section -->
-        <div id="profileSection" class="section">
-          <h2>Your Profile</h2>
-          <form id="profileForm">
-            <label for="profileUsername">Username:</label>
-            <input type="text" id="profileUsername" disabled>
-            
-            <label for="profileName">Name:</label>
-            <input type="text" id="profileName">
-            
-            <label for="profileAge">Age:</label>
-            <input type="number" id="profileAge">
-            
-            <label for="profileDiscipline">Discipline:</label>
-            <input type="text" id="profileDiscipline">
-            
-            <label for="profileSemester">Current Semester:</label>
-            <input type="number" id="profileSemester">
-            
-            <label for="profileCareerGoal">Career Goal / Interests:</label>
-            <input type="text" id="profileCareerGoal" placeholder="e.g., Research, Management, etc.">
-            
-            <button type="button" id="editProfileBtn" onclick="toggleEdit(true)">Edit</button>
-            <button type="button" id="saveProfileBtn" onclick="updateProfile()" class="hidden">Save</button>
-            <button type="button" id="cancelProfileBtn" onclick="toggleEdit(false)" class="hidden">Cancel</button>
-            <p id="profileMessage" style="color:green;"></p>
-          </form>
-        </div>
-        
-        <!-- Course Details Section -->
-        <div id="courseDetailsSection" class="section hidden">
-          <h2>Course Details</h2>
-          <label for="courseSemester">Semester:</label>
-          <input type="number" id="courseSemester" placeholder="Enter semester">
-          <button onclick="getCourses()">Get Courses</button>
-          <div id="coursesOutput"></div>
-        </div>
-        
-        <!-- Academic History Section -->
-        <div id="academicHistorySection" class="section hidden">
-          <h2>Academic History</h2>
-          
-          <!-- Form to Add New Academic History Record -->
-          <div id="addHistoryForm">
-            <h3>Add Academic History</h3>
-            <label for="addHistorySemester">Semester:</label>
-            <select id="addHistorySemester" onchange="loadSubjectsForAdd()">
-              <!-- Populate with semesters before current semester -->
-            </select>
-            
-            <label for="subjectDropdown">Select Subject:</label>
-            <select id="subjectDropdown">
-              <option>Loading subjects...</option>
-            </select>
-            
-            <label for="subjectGrade">Grade:</label>
-            <input type="number" id="subjectGrade" placeholder="Enter grade">
-            
-            <label for="subjectAttendance">Attendance (%):</label>
-            <input type="number" id="subjectAttendance" placeholder="Enter attendance">
-            
-            <button onclick="addHistory()">Add Academic History</button>
-            <p id="historyOutput"></p>
-          </div>
-          
-          <hr>
-          
-          <!-- Filter & Display Saved Records -->
-          <div id="filterHistory">
-            <h3>View Academic Records</h3>
-            <label for="historySemester">Show Records for Semester:</label>
-            <select id="historySemester" onchange="loadHistory()">
-              <!-- Populate with semesters before current semester -->
-            </select>
-          </div>
-          
-          <!-- Display Area -->
-          <div id="historyDisplay"></div>
-          <!-- Overall CGPA -->
-          <div id="cgpaDisplay"></div>
-        </div>
-        
-        <!-- Recommend Courses Section -->
-        <div id="recommendSection" class="section hidden">
-          <h2>Recommend Courses for Next Semester</h2>
-          <label for="currentSemesterRec">Current Semester:</label>
-          <input type="number" id="currentSemesterRec" placeholder="Enter current semester">
-          <button onclick="recommendCourses()">Recommend Courses</button>
-          <div id="recommendOutput" style="margin-top:15px; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #f9f9f9;"></div>
-        </div>
-        
-        <!-- Predict Grades Section -->
-        <div id="predictGradesSection" class="section hidden">
-          <h2>Predict Needed Grades</h2>
-          
-          <!-- Semester selection dropdown (only past semesters) -->
-          <label for="predictSemester">Select Required Semester:</label>
-          <select id="predictSemester" onchange="loadPredictData()">
-            <!-- Options populated dynamically -->
-          </select>
-          
-          <!-- Input for Dream/Target Grade -->
-          <label for="dreamGrade">Target (Dream) Grade (%):</label>
-          <input type="number" id="dreamGrade" placeholder="e.g., 85">
-          
-          <button onclick="predictNeededGrade()">Predict Needed Grade</button>
-          
-          <!-- Output container for formatted prediction results -->
-          <div id="predictOutput" style="margin-top:15px;"></div>
-        </div>
-        
-        <!-- Skill Chart Section -->
-        <div id="skillChartSection" class="section hidden">
-          <h2>Skill Chart</h2>
-          <button onclick="generateSkillChart()">Generate Skill Chart</button>
-          <canvas id="skillRadarChart"></canvas>
-        </div>
-        
-        <!-- Chat with AI Section -->
-        <div id="chatSection" class="section hidden">
-          <h2>Chat with AI</h2>
-          <div id="chatbox"></div>
-          <label for="chatInput">Your Message:</label>
-          <input type="text" id="chatInput" placeholder="Type your message">
-          <button onclick="chatWithAi()">Send</button>
-        </div>
-
-        <!-- Psychological Evaluation Section -->
-        <div id="psychEvalSection" class="section hidden">
-          <h2>Psychological Evaluation</h2>
-          <div id="psychEvalQuestion">
-            <p id="currentQuestion">Click "Start" to begin the evaluation.</p>
-            <button onclick="startPsychEval()">Start</button>
-          </div>
-          <div id="psychEvalForm" class="hidden">
-            <p id="currentQuestionText"></p>
-            <textarea id="currentAnswer" placeholder="Type your response here..." required></textarea>
-            <button onclick="submitPsychEvalAnswer()">Submit</button>
-          </div>
-          <div id="psychEvalOutput" style="margin-top: 15px;"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script>
-    let loggedUsername = "";
-    let userProfile = {};
-    let skillRadarChart = null;  // Global variable for the chart instance
-
-    // Show/hide dashboard sections based on menu selection
-    function showSection(sectionId) {
-      const sections = ["profileSection", "courseDetailsSection", "academicHistorySection",
-                        "recommendSection", "predictGradesSection", "skillChartSection", "chatSection", "psychEvalSection"];
-      sections.forEach(id => {
-        document.getElementById(id).classList.add("hidden");
-      });
-      document.getElementById(sectionId).classList.remove("hidden");
-      // Update active menu
-      const menuItems = document.querySelectorAll(".sidebar-menu .menu-item");
-      menuItems.forEach(item => item.classList.remove("active"));
-      event.target.closest(".menu-item").classList.add("active");
-      if (sectionId === "academicHistorySection") {
-        populateHistorySemesters();
-      }
-    }
-
-    function showRegistration() {
-      document.getElementById("registrationSection").classList.remove("hidden");
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("authToggle").classList.add("hidden"); // Hide the auth toggle buttons
-    }
-    
-    function showLogin() {
-      document.getElementById("loginSection").classList.remove("hidden");
-      document.getElementById("registrationSection").classList.add("hidden");
-      document.getElementById("authToggle").classList.add("hidden"); // Hide the auth toggle buttons
-    }
-    
-    // Add a new function to go back to auth toggle
-    function showAuthToggle() {
-      document.getElementById("loginSection").classList.add("hidden");
-      document.getElementById("registrationSection").classList.add("hidden");
-      document.getElementById("authToggle").classList.remove("hidden");
-    }
-
-    function registerUser() {
-      const username = document.getElementById("regUsername").value;
-      const password = document.getElementById("regPassword").value;
-      const name = document.getElementById("regName").value;
-      const age = document.getElementById("regAge").value;
-      const discipline = document.getElementById("regDiscipline").value;
-      const current_semester = document.getElementById("regSemester").value;
-      
-      fetch('/register', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username, password, name, age, discipline, current_semester })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          document.getElementById("regMessage").textContent = data.error;
-        } else {
-          loggedUsername = username;
-          userProfile = data.user;
-          document.getElementById("regMessage").textContent = "Registration successful.";
-          loadProfile();
-          // Hide auth section and show dashboard content
-          document.getElementById("authSection").classList.add("hidden");
-          document.getElementById("dashboardContent").classList.remove("hidden");
-          document.getElementById("userProfileSection").style.display = "flex"; // Show user profile section
-        }
-      });
-    }
-    
-    function loginUser() {
-      const username = document.getElementById("loginUsername").value;
-      const password = document.getElementById("loginPassword").value;
-      
-      fetch('/login', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username, password })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          document.getElementById("loginMessage").textContent = data.error;
-        } else {
-          loggedUsername = username;
-          userProfile = data.user;
-          document.getElementById("loginMessage").textContent = "";
-          loadProfile();
-          document.getElementById("authSection").classList.add("hidden");
-          document.getElementById("dashboardContent").classList.remove("hidden");
-          document.getElementById("userProfileSection").style.display = "flex"; // Show user profile section
-        }
-      });
-    }
-    
-    // Called after login or registration to load profile details into form fields.
-    function loadProfile() {
-      document.getElementById("profileUsername").value = userProfile.username || "";
-      document.getElementById("profileName").value = userProfile.name || "";
-      document.getElementById("profileAge").value = userProfile.age || "";
-      document.getElementById("profileDiscipline").value = userProfile.discipline || "";
-      document.getElementById("profileSemester").value = userProfile.current_semester || "";
-      document.getElementById("profileCareerGoal").value = userProfile.career_goal || "";
-      document.getElementById("user-name").textContent = userProfile.name || userProfile.username;
-    }
-    
-    // Toggle edit mode: if editing, show Save/Cancel, disable Edit button.
-    function toggleEdit(editing) {
-      const inputs = document.querySelectorAll("#profileForm input:not([id='profileUsername'])");
-      inputs.forEach(input => input.disabled = !editing);
-      document.getElementById("editProfileBtn").classList.toggle("hidden", editing);
-      document.getElementById("saveProfileBtn").classList.toggle("hidden", !editing);
-      document.getElementById("cancelProfileBtn").classList.toggle("hidden", !editing);
-      if (!editing) {
-        // Reload original profile if cancelled.
-        loadProfile();
-        document.getElementById("profileMessage").textContent = "";
-      }
-    }
-    
-    // Called when Save is clicked – sends updated profile data to backend.
-    function updateProfile() {
-      const updatedData = {
-        username: document.getElementById("profileUsername").value,
-        name: document.getElementById("profileName").value,
-        age: document.getElementById("profileAge").value,
-        discipline: document.getElementById("profileDiscipline").value,
-        current_semester: document.getElementById("profileSemester").value,
-        career_goal: document.getElementById("profileCareerGoal").value
-      };
-      fetch('/update_profile', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(updatedData)
-      })
-      .then(response => response.json())
-      .then(data => {
-        if(data.error) {
-          document.getElementById("profileMessage").textContent = data.error;
-          document.getElementById("profileMessage").style.color = "red";
-        } else {
-          userProfile = data.user; // update global userProfile variable
-          document.getElementById("profileMessage").textContent = data.message;
-          document.getElementById("profileMessage").style.color = "green";
-          toggleEdit(false);
-        }
-      });
-    }
-    
-    function getCourses() {
-      const semester = document.getElementById("courseSemester").value;
-      // Use the discipline from the logged-in user profile
-      const discipline = userProfile.discipline;
-      fetch(`/get_courses?discipline=${encodeURIComponent(discipline)}&semester=${semester}`)
-        .then(response => response.json())
-        .then(data => {
-          let outputHTML = "";
-          if (data.error) {
-            outputHTML = `<p>${data.error}</p>`;
-          } else if (data.response) {
-            outputHTML = `<p>${data.response}</p>`;
-          } else if (Array.isArray(data) && data.length > 0) {
-            outputHTML += "<h3>Available Courses:</h3>";
-            data.forEach(course => {
-              // Use a small red dot if the course is mandatory.
-              const mandatoryDot = Number(course["Mandatory"]) >= 1 ? 
-                                    '<span class="mandatory-dot" title="Mandatory Course"></span>' : '';
-              outputHTML += `
-                <div class="course-card">
-                  <h4>${course["Course Code"]} - ${course["Course Title"]} ${mandatoryDot}</h4>
-                  <p><strong>Credits:</strong> ${course.Credits}</p>
-                  <p><strong>Hardness:</strong> ${course.Hardness}</p>
-                  <p>${course.Description}</p>
-                </div>
-              `;
-            });
-          } else {
-            outputHTML = "<p>No courses found.</p>";
-          }
-          document.getElementById("coursesOutput").innerHTML = outputHTML;
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("coursesOutput").innerHTML = "<p>Error fetching courses.</p>";
-        });
-    }
-    
-    function populateHistorySemesters() {
-      const currentSem = parseInt(userProfile.current_semester) || 1;
-      const addSemSelect = document.getElementById("addHistorySemester");
-      const filterSemSelect = document.getElementById("historySemester");
-      addSemSelect.innerHTML = "";
-      filterSemSelect.innerHTML = "";
-      // Allow only semesters less than current (assume current semester is not complete)
-      for (let i = 1; i < currentSem; i++) {
-        let optAdd = document.createElement("option");
-        optAdd.value = i;
-        optAdd.text = "Semester " + i;
-        addSemSelect.appendChild(optAdd);
-        
-        let optFilter = document.createElement("option");
-        optFilter.value = i;
-        optFilter.text = "Semester " + i;
-        filterSemSelect.appendChild(optFilter);
-      }
-      // Trigger default load for adding subjects in the add-history form:
-      if (addSemSelect.options.length > 0) {
-        addSemSelect.selectedIndex = 0;
-        loadSubjectsForAdd();
-        filterSemSelect.selectedIndex = 0;
-        loadHistory();
-      } else {
-        document.getElementById("historyDisplay").innerHTML = "<p>No previous semesters available.</p>";
-      }
-    }
-    
-    function loadSubjectsForAdd() {
-      const semester = document.getElementById("addHistorySemester").value;
-      // Assume the user’s discipline from their profile is used.
-      const discipline = userProfile.discipline;
-      fetch(`/get_courses?discipline=${encodeURIComponent(discipline)}&semester=${semester}`)
-        .then(response => response.json())
-        .then(data => {
-          const dropdown = document.getElementById("subjectDropdown");
-          dropdown.innerHTML = "";
-          if (Array.isArray(data) && data.length > 0) {
-            data.forEach(course => {
-              let option = document.createElement("option");
-              option.value = course["Course Code"];
-              option.text = `${course["Course Code"]} - ${course["Course Title"]}`;
-              dropdown.appendChild(option);
-            });
-          } else {
-            dropdown.innerHTML = "<option>No subjects found</option>";
-          }
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("subjectDropdown").innerHTML = "<option>Error loading subjects</option>";
-        });
-    }
-    
-    function addHistory() {
-      const semester = document.getElementById("addHistorySemester").value;
-      const subject_code = document.getElementById("subjectDropdown").value;
-      const grade = document.getElementById("subjectGrade").value;
-      const attendance = document.getElementById("subjectAttendance").value;
-      
-      const subjectData = {
-        subject_code: subject_code,
-        grade: grade,
-        attendance: attendance,
-        semester: semester
-      };
-      
-      fetch('/add_history', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username: loggedUsername, subject: subjectData })
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.error) {
-          document.getElementById("historyOutput").innerHTML = `<p style="color:red;">${data.error}</p>`;
-        } else {
-          document.getElementById("historyOutput").innerHTML = `<p style="color:green;">Subject history updated.</p>`;
-          // Clear the grade and attendance fields.
-          document.getElementById("subjectGrade").value = "";
-          document.getElementById("subjectAttendance").value = "";
-          // Reload history display as well.
-          loadHistory();
-        }
-      })
-      .catch(error => {
-        console.error(error);
-        document.getElementById("historyOutput").innerHTML = "<p style='color:red;'>Error updating history.</p>";
-      });
-    }
-    
-    function loadHistory() {
-      const selectedSemester = document.getElementById("historySemester").value;
-      fetch(`/get_history?username=${encodeURIComponent(loggedUsername)}`)
-        .then(response => response.json())
-        .then(data => {
-          // Filter records for the selected semester.
-          const semesterRecords = data.filter(record => record.semester == selectedSemester);
-          let historyHTML = "";
-          let totalCredits = 0;
-          let weightedGradeSum = 0;
-          if (semesterRecords.length > 0) {
-            historyHTML += `<h3>Academic Records: Semester ${selectedSemester}</h3><ul>`;
-            semesterRecords.forEach(rec => {
-              let credits = parseFloat(rec.credits) || 0;
-              let grade = parseFloat(rec.grade) || 0;
-              totalCredits += credits;
-              weightedGradeSum += (grade * credits);
-              historyHTML += `<li>
-                <strong>${rec.subject_code} - ${rec.course_title}</strong> (Credits: ${credits})  
-                | Grade: ${grade} | Attendance: ${rec.attendance}%
-              </li>`;
-            });
-            historyHTML += "</ul>";
-          } else {
-            historyHTML = `<p>No academic records found for Semester ${selectedSemester}.</p>`;
-          }
-          
-          // Calculate SGPA for that semester.
-          let sgpa = totalCredits > 0 ? (weightedGradeSum / totalCredits).toFixed(2) : "N/A";
-          let qualificationStatus = "";
-          if (totalCredits < 18) {
-            qualificationStatus = `<span style="color: red;">Not Qualified (Credits: ${totalCredits})</span>`;
-          } else {
-            qualificationStatus = `<span style="color: green;">Qualified (Credits: ${totalCredits})</span>`;
-          }
-          
-          historyHTML += `<p>SGPA: ${sgpa} | ${qualificationStatus}</p>`;
-          document.getElementById("historyDisplay").innerHTML = historyHTML;
-          
-          // Calculate overall CGPA from all records in previous semesters.
-          const previousRecords = data.filter(record => parseInt(record.semester) < parseInt(userProfile.current_semester));
-          let overallCredits = 0, overallWeightedSum = 0;
-          previousRecords.forEach(record => {
-            let c = parseFloat(record.credits) || 0;
-            let g = parseFloat(record.grade) || 0;
-            overallCredits += c;
-            overallWeightedSum += (g * c);
-          });
-          let cgpa = overallCredits > 0 ? (overallWeightedSum / overallCredits).toFixed(2) : "N/A";
-          document.getElementById("cgpaDisplay").innerHTML = `<h3>Overall CGPA (Semesters 1 - ${parseInt(userProfile.current_semester) - 1}): ${cgpa}</h3>`;
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("historyDisplay").innerHTML = "<p>Error loading academic history.</p>";
-        });
-    }
-    
-    function recommendCourses() {
-      const semester = document.getElementById("currentSemesterRec").value;
-      fetch('/recommend_courses', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ username: loggedUsername, semester })
-      })
-      .then(response => response.json())
-      .then(data => {
-        let outputHTML = "";
-        if (data.recommendation_explanation) {
-          outputHTML += "<div class='recommendation-container' style='padding:20px; border:1px solid #ccc; border-radius: 8px; background:#fff;'>";
-          
-          // Split sections by header
-          const sections = data.recommendation_explanation.split(/MANDATORY COURSES:|OPTIONAL COURSES:/);
-          const mandatoryCourses = sections[1]?.split('$').filter(line => line.trim());
-          const optionalCourses = sections[2]?.split('$').filter(line => line.trim());
-          
-          // Display Mandatory Courses
-          outputHTML += "<h3 style='color: var(--accent); margin-bottom: 15px;'>MANDATORY COURSES:</h3>";
-          if (mandatoryCourses && mandatoryCourses.length > 0) {
-            mandatoryCourses.forEach(course => {
-              if (course.trim()) {
-                outputHTML += `<div style='padding: 10px; margin: 5px 0; border: 1px solid #eee; border-radius: 4px;'>${course.trim()}</div>`;
-              }
-            });
-          }
-
-          // Display Optional Courses
-          outputHTML += "<h3 style='color: var(--accent); margin-top: 20px; margin-bottom: 15px;'>OPTIONAL COURSES:</h3>";
-          if (optionalCourses && optionalCourses.length > 0) {
-            optionalCourses.forEach(course => {
-              if (course.trim()) {
-                outputHTML += `<div style='padding: 10px; margin: 5px 0; border: 1px solid #eee; border-radius: 4px;'>${course.trim()}</div>`;
-              }
-            });
-          }
-          
-          outputHTML += "</div>";
-        }
-        document.getElementById("recommendOutput").innerHTML = outputHTML;
-      })
-      .catch(error => {
-        console.error(error);
-        document.getElementById("recommendOutput").innerHTML = "<p style='color: red;'>Error fetching recommendation.</p>";
-      });
-    }
-    
-    function predictGrades() {
-      const past = document.getElementById("pastPerformance").value;
-      const attendance = document.getElementById("attendance").value;
-      const difficulty = document.getElementById("difficulty").value;
-      fetch('/predict_grades', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ past_performance: past, attendance: attendance, course_difficulty: difficulty })
-      })
-      .then(response => response.json())
-      .then(data => {
-        document.getElementById("gradeOutput").textContent = JSON.stringify(data, null, 2);
-      });
-    }
-    
-    function getSkillChart(forceReload = false) {
-      const url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}${forceReload ? "&force=true" : ""}`;
-      
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          if (data.error) {
-            document.getElementById("skillChartSection").innerHTML = `<p style="color:red;">${data.error}</p>`;
-            return;
-          }
-
-          // Ensure the data is a valid JSON object
-          if (typeof data !== "object" || Array.isArray(data)) {
-            document.getElementById("skillChartSection").innerHTML = `<p style="color:red;">Invalid data format received.</p>`;
-            return;
-          }
-
-          // Extract labels and values for the chart
-          const labels = Object.keys(data);
-          const ratings = Object.values(data);
-
-          // Get canvas context and destroy previous chart instance if exists
-          const ctx = document.getElementById("skillRadarChart").getContext("2d");
-          if (window.skillRadarChart) {
-            window.skillRadarChart.destroy();
-          }
-
-          // Create the radar chart
-          window.skillRadarChart = new Chart(ctx, {
-            type: 'radar',
-            data: {
-              labels: labels,
-              datasets: [{
-                label: 'Skill Ratings',
-                data: ratings,
-                backgroundColor: 'rgba(52, 152, 219, 0.3)',  // Slightly more opaque
-                borderColor: 'rgba(52, 152, 219, 0.8)',      // More visible border
-                pointBackgroundColor: 'rgba(155, 89, 182, 0.8)',
-                pointBorderColor: '#fff',
-                pointHoverBackgroundColor: '#fff',
-                pointHoverBorderColor: 'rgba(155, 89, 182, 1)',
-                borderWidth: 2,  // Slightly thicker border
-                pointRadius: 4   // Slightly larger points
-              }]
-            },
-            options: {
-              responsive: true,
-              scales: {
-                r: {
-                  angleLines: { 
-                    color: 'rgba(204, 204, 204, 0.3)'  // Lighter angle lines
-                  },
-                  grid: { 
-                    color: 'rgba(204, 204, 204, 0.3)'  // Lighter grid lines
-                  },
-                  suggestedMin: 0,
-                  suggestedMax: 100,
-                  ticks: {
-                    display: false  // Hide numerical values
-                  },
-                  pointLabels: { 
-                    font: { 
-                      size: 14,
-                      family: 'Arial',
-                      weight: '500'
-                    },
-                    color: '#2c3e50'  // Darker text color
-                  }
-                }
-              },
-              plugins: {
-                legend: { 
-                  display: true, 
-                  position: 'top',
-                  labels: {
-                    font: {
-                      size: 14,
-                      family: 'Arial'
-                    }
-                  }
-                }
-              }
-            }
-          });
-
-          // Add this CSS to control the canvas size
-          const canvas = document.getElementById("skillRadarChart");
-          canvas.style.maxWidth = '600px';  // Adjust this value to make it smaller
-          canvas.style.maxHeight = '600px'; // Adjust this value to make it smaller
-          canvas.style.margin = 'auto';     // Center the canvas
-        })
-        .catch(error => {
-          console.error("Error generating skill chart:", error);
-          document.getElementById("skillChartSection").innerHTML = "<p style='color:red;'>Error generating skill chart.</p>";
-        });
-    }
-    
-    function generateSkillChart() {
-      const url = `/generate_skill_chart?username=${encodeURIComponent(loggedUsername)}`;
-      
-      fetch(url)
-        .then(response => response.json())
-        .then(data => {
-          // Set up container with two canvas elements side by side
-          document.getElementById("skillChartSection").innerHTML = `
-            <h2>Skill Chart</h2>
-            <button onclick="generateSkillChart()">Generate Skill Chart</button>
-            <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 30px; margin-top: 20px;">
-              <div style="width: 800px; height: 800px;">
-                <h3>Current Skills</h3>
-                <canvas id="currentSkillChart"></canvas>
-              </div>
-              <div style="width: 800px; height: 800px;">
-                <h3>Required Skills</h3>
-                <canvas id="requiredSkillChart"></canvas>
-              </div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <a href="#" class="logo">
+                <i class="fas fa-graduation-cap"></i>
+                EDUSYNC
+            </a>
+            <div class="nav-buttons">
+                <button class="nav-btn secondary" onclick="showSection('register')">Sign Up</button>
+                <button class="nav-btn" onclick="showSection('login')">Login</button>
             </div>
-          `;
+        </div>
+    </header>
 
-          const chartOptions = {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              r: {
-                angleLines: { color: 'rgba(204, 204, 204, 0.3)' },
-                grid: { color: 'rgba(204, 204, 204, 0.3)' },
-                suggestedMin: 0,
-                suggestedMax: 100,
-                ticks: { display: false },
-                pointLabels: { 
-                  font: { 
-                    size: 16,
-                    family: 'Arial', 
-                    weight: '500' 
-                  },
-                  color: '#2c3e50',
-                  callback: function(label) {
-                    // Add line breaks for long labels
-                    if (label.length > 15) {
-                      const words = label.split(' ');
-                      const midpoint = Math.floor(words.length / 2);
-                      return words.slice(0, midpoint).join(' ') + '\n' + words.slice(midpoint).join(' ');
-                    }
-                    return label;
-                  }
-                }
-              }
-            },
-            plugins: {
-              legend: { 
-                display: true, 
-                position: 'top',
-                labels: { 
-                  font: { 
-                    size: 16, 
-                    family: 'Arial' 
-                  } 
-                }
-              }
-            }
-          };
+    <!-- Main Container -->
+    <div class="main-container">
+        <!-- Sidebar -->
+        <nav class="sidebar" id="sidebar">
+            <ul class="sidebar-nav">
+                <li><button onclick="showSection('dashboard')" class="active"><i class="fas fa-home"></i> Dashboard</button></li>
+                <li><button onclick="showSection('profile')"><i class="fas fa-user"></i> Profile</button></li>
+                <li><button onclick="showSection('psych-eval')"><i class="fas fa-brain"></i> Psychology</button></li>
+                <li><button onclick="showSection('history')"><i class="fas fa-history"></i> Academic History</button></li>
+                <li><button onclick="showSection('courses')"><i class="fas fa-book"></i> Courses</button></li>
+                <li><button onclick="showSection('recommendations')"><i class="fas fa-lightbulb"></i> Recommendations</button></li>
+                <li><button onclick="showSection('predictions')"><i class="fas fa-chart-line"></i> Grade Prediction</button></li>
+                <li><button onclick="showSection('skills')"><i class="fas fa-tasks"></i> Skill Analysis</button></li>
+                <li><button onclick="showSection('chat')"><i class="fas fa-comments"></i> AI Mentor</button></li>
+            </ul>
+        </nav>
 
-          // Draw Current Skills Radar Chart
-          const currentCtx = document.getElementById("currentSkillChart").getContext("2d");
-          new Chart(currentCtx, {
-            type: 'radar',
-            data: {
-              labels: Object.keys(data.current),
-              datasets: [{
-                label: 'Current Skills',
-                data: Object.values(data.current),
-                backgroundColor: 'rgba(52, 152, 219, 0.3)',
-                borderColor: 'rgba(52, 152, 219, 0.8)',
-                pointBackgroundColor: 'rgba(155, 89, 182, 0.8)',
-                borderWidth: 2,
-                pointRadius: 4
-              }]
-            },
-            options: chartOptions
-          });
+        <!-- Content Area -->
+        <main class="content-area">
+            <div class="content-container">
+                <!-- Dashboard Section -->
+                <section id="dashboard" class="section active">
+                    <div class="welcome-banner">
+                        <h1 class="welcome-title">Welcome to EDUSYNC</h1>
+                        <p class="welcome-subtitle">Your AI-powered academic intelligence platform</p>
+                        <div class="flex justify-center gap-2">
+                            <button class="btn" onclick="showSection('register')">
+                                <i class="fas fa-user-plus"></i> Get Started
+                            </button>
+                            <button class="btn secondary" onclick="showSection('courses')">
+                                <i class="fas fa-book"></i> Explore Courses
+                            </button>
+                        </div>
+                    </div>
 
-          // Draw Required Skills Radar Chart
-          const requiredCtx = document.getElementById("requiredSkillChart").getContext("2d");
-          new Chart(requiredCtx, {
-            type: 'radar',
-            data: {
-              labels: Object.keys(data.required),
-              datasets: [{
-                label: 'Required Skills',
-                data: Object.values(data.required),
-                backgroundColor: 'rgba(255, 99, 132, 0.3)',
-                borderColor: 'rgba(255, 99, 132, 0.8)',
-                pointBackgroundColor: 'rgba(255, 99, 132, 0.8)',
-                borderWidth: 2,
-                pointRadius: 4
-              }]
-            },
-            options: chartOptions
-          });
-        })
-        .catch(error => {
-          console.error('Error:', error);
-          document.getElementById("skillChartSection").innerHTML = `
-            <h2>Skill Chart</h2>
-            <button onclick="generateSkillChart()">Generate Skill Chart</button>
-            <p style="color: red;">Error generating skill chart. Please try again.</p>
-          `;
-        });
-    }
-    
-    function chatWithAi() {
-      const message = document.getElementById("chatInput").value;
-      fetch('/chat_with_ai', {
-          method: 'POST',
-          headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ 
-              message: message,
-              username: loggedUsername
-          })
-      })
-      .then(response => response.json())
-      .then(data => {
-          const chatbox = document.getElementById("chatbox");
-          chatbox.innerHTML += `<div><b>You:</b> ${message}</div>`;
-          chatbox.innerHTML += `<div><b>AI:</b> ${data.response}</div>`;
-          document.getElementById("chatInput").value = '';
-      });
-    }
-    
-    // Populate the predictSemester dropdown with the current semester and future semesters.
-    function populatePredictSemesters() {
-      // Get the current semester from the user profile (e.g., from user.csv)
-      const currentSem = parseInt(userProfile.current_semester) || 1;
-      const predictSelect = document.getElementById("predictSemester");
-      predictSelect.innerHTML = "";
-      // Define the maximum future semester to include (adjust as necessary)
-      const maxFutureSem = currentSem + 7; // current + 2 future semesters
-      for (let i = currentSem; i <= maxFutureSem; i++) {
-        let option = document.createElement("option");
-        option.value = i;
-        option.text = "Semester " + i;
-        predictSelect.appendChild(option);
-      }
-      // Load academic data for the initial selection.
-      loadPredictData();
-    }
-    
-    // Load available academic data for the selected semester.
-    function loadPredictData() {
-      const selectedSem = document.getElementById("predictSemester").value;
-      fetch(`/get_history?username=${encodeURIComponent(loggedUsername)}`)
-        .then(response => response.json())
-        .then(data => {
-          // Filter records matching the selected semester.
-          const semRecords = data.filter(record => record.semester == selectedSem);
-          let outputHTML = "";
-          if (semRecords.length > 0) {
-            outputHTML += `<p>Found ${semRecords.length} record(s) for Semester ${selectedSem}.</p>`;
-            let totalCredits = 0, weightedSum = 0;
-            semRecords.forEach(rec => {
-              let credits = parseFloat(rec.credits) || 0;
-              let grade = parseFloat(rec.grade) || 0;
-              totalCredits += credits;
-              weightedSum += grade * credits;
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number">15</div>
+                            <div class="stat-label">Psychology Criteria</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">AI</div>
+                            <div class="stat-label">Powered Analysis</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number">24/7</div>
+                            <div class="stat-label">Support Available</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Academic Intelligence</h3>
+                                <p class="card-subtitle">Personalized course recommendations and grade predictions</p>
+                            </div>
+                            <p>Get AI-powered recommendations based on your academic history, career goals, and psychological profile.</p>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Psychological Assessment</h3>
+                                <p class="card-subtitle">Comprehensive evaluation of learning traits</p>
+                            </div>
+                            <p>Understand your strengths and growth areas through our comprehensive psychological evaluation system.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Register Section -->
+                <section id="register" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Create Your Account</h2>
+                            <p class="card-subtitle">Join EDUSYNC to unlock personalized academic guidance</p>
+                        </div>
+                        
+                        <form class="grid grid-2" onsubmit="registerUser(); return false;">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-input" id="reg-username" placeholder="Choose a unique username" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-input" id="reg-password" placeholder="Create a secure password" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" id="reg-name" placeholder="Enter your full name" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-input" id="reg-age" placeholder="Your age" min="16" max="30" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Discipline</label>
+                                <input type="text" class="form-input" id="reg-discipline" placeholder="e.g., Computer Science" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Current Semester</label>
+                                <select class="form-input" id="reg-semester" required>
+                                    <option value="">Select semester</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label class="form-label">Career Goal / Interests</label>
+                                <textarea class="form-input" id="reg-career" placeholder="Describe your career aspirations and interests..."></textarea>
+                            </div>
+                            
+                            <div class="flex gap-2" style="grid-column: 1 / -1;">
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                                <button type="button" class="btn secondary" onclick="showSection('dashboard')">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Login Section -->
+                <section id="login" class="section">
+                    <div class="card" style="max-width: 400px; margin: 0 auto;">
+                        <div class="card-header text-center">
+                            <h2 class="card-title">Welcome Back</h2>
+                            <p class="card-subtitle">Sign in to your EDUSYNC account</p>
+                        </div>
+                        
+                        <form onsubmit="loginUser(); return false;">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-input" id="login-username" placeholder="Enter your username" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" class="form-input" id="login-password" placeholder="Enter your password" required>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="submit" class="btn" style="flex: 1;">
+                                    <i class="fas fa-sign-in-alt"></i> Sign In
+                                </button>
+                                <button type="button" class="btn secondary" onclick="showSection('dashboard')">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Profile Section -->
+                <section id="profile" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Your Profile</h2>
+                            <p class="card-subtitle">Manage your personal information and preferences</p>
+                        </div>
+                        
+                        <form class="grid grid-2" onsubmit="updateProfile(); return false;">
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" class="form-input" id="profile-username" readonly>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-input" id="profile-name">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Age</label>
+                                <input type="number" class="form-input" id="profile-age" min="16" max="30">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Discipline</label>
+                                <input type="text" class="form-input" id="profile-discipline">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Current Semester</label>
+                                <select class="form-input" id="profile-semester">
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" style="grid-column: 1 / -1;">
+                                <label class="form-label">Career Goal / Interests</label>
+                                <textarea class="form-input" id="profile-career"></textarea>
+                            </div>
+                            
+                            <div class="flex gap-2" style="grid-column: 1 / -1;">
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-save"></i> Save Changes
+                                </button>
+                                <button type="button" class="btn secondary" onclick="cancelProfileEdit()">
+                                    <i class="fas fa-times"></i> Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </section>
+
+                <!-- Courses Section -->
+                <section id="courses" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Course Explorer</h2>
+                            <p class="card-subtitle">Search and discover courses for your discipline</p>
+                        </div>
+                        
+                        <div class="grid grid-2 mb-2">
+                            <div class="form-group">
+                                <label class="form-label">Discipline</label>
+                                <input type="text" class="form-input" id="course-discipline" placeholder="e.g., Computer Science">
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Semester</label>
+                                <select class="form-input" id="course-semester">
+                                    <option value="">Select semester</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="getCourses()">
+                            <i class="fas fa-search"></i> Search Courses
+                        </button>
+                        
+                        <div id="courses-results" class="mt-2"></div>
+                    </div>
+                </section>
+
+                <!-- Academic History Section -->
+                <section id="history" class="section">
+                    <div class="grid grid-2">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Add Academic Record</h3>
+                                <p class="card-subtitle">Record your academic performance</p>
+                            </div>
+                            
+                            <form onsubmit="addHistory(); return false;">
+                                <div class="form-group">
+                                    <label class="form-label">Semester</label>
+                                    <select class="form-input" id="history-semester" required onchange="loadSubjects()">
+                                        <option value="">Select semester</option>
+                                        <option value="1">Semester 1</option>
+                                        <option value="2">Semester 2</option>
+                                        <option value="3">Semester 3</option>
+                                        <option value="4">Semester 4</option>
+                                        <option value="5">Semester 5</option>
+                                        <option value="6">Semester 6</option>
+                                        <option value="7">Semester 7</option>
+                                        <option value="8">Semester 8</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Subject</label>
+                                    <select class="form-input" id="history-subject" required>
+                                        <option value="">Select subject</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Grade</label>
+                                    <input type="text" class="form-input" id="history-grade" placeholder="e.g., A, B+, 85%" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Attendance (%)</label>
+                                    <input type="number" class="form-input" id="history-attendance" placeholder="e.g., 85" min="0" max="100" required>
+                                </div>
+                                
+                                <button type="submit" class="btn">
+                                    <i class="fas fa-plus"></i> Add Record
+                                </button>
+                            </form>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3 class="card-title">Academic Records</h3>
+                                <p class="card-subtitle">View your academic history</p>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Filter by Semester</label>
+                                <select class="form-input" id="view-semester" onchange="viewHistory()">
+                                    <option value="">All semesters</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            
+                            <button class="btn secondary" onclick="viewHistory()">
+                                <i class="fas fa-eye"></i> View Records
+                            </button>
+                            
+                            <div id="history-results" class="mt-2"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Recommendations Section -->
+                <section id="recommendations" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Course Recommendations</h2>
+                            <p class="card-subtitle">AI-powered course suggestions based on your profile</p>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Semester for Recommendations</label>
+                            <select class="form-input" id="recommend-semester">
+                                <option value="">Select semester</option>
+                                <option value="1">Semester 1</option>
+                                <option value="2">Semester 2</option>
+                                <option value="3">Semester 3</option>
+                                <option value="4">Semester 4</option>
+                                <option value="5">Semester 5</option>
+                                <option value="6">Semester 6</option>
+                                <option value="7">Semester 7</option>
+                                <option value="8">Semester 8</option>
+                            </select>
+                        </div>
+                        
+                        <button class="btn" onclick="recommendCourses()">
+                            <i class="fas fa-lightbulb"></i> Get Recommendations
+                        </button>
+                        
+                        <div id="recommendations-results" class="mt-2"></div>
+                    </div>
+                </section>
+
+                <!-- Grade Predictions Section -->
+                <section id="predictions" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Grade Predictions</h2>
+                            <p class="card-subtitle">Predict your academic performance for upcoming semesters</p>
+                        </div>
+                        
+                        <div class="grid grid-2">
+                            <div class="form-group">
+                                <label class="form-label">Target Semester</label>
+                                <select class="form-input" id="predict-semester" required>
+                                    <option value="">Select semester</option>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="form-label">Target Grade (%)</label>
+                                <input type="number" class="form-input" id="target-grade" placeholder="e.g., 85" min="0" max="100">
+                            </div>
+                        </div>
+                        
+                        <button class="btn" onclick="predictGrades()">
+                            <i class="fas fa-chart-line"></i> Predict Grades
+                        </button>
+                        
+                        <div id="predictions-results" class="mt-2"></div>
+                    </div>
+                </section>
+
+                <!-- Skills Section -->
+                <section id="skills" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Skill Analysis</h2>
+                            <p class="card-subtitle">Analyze your current skills vs required skills for your career goals</p>
+                        </div>
+                        
+                        <button class="btn" onclick="generateSkillChart()">
+                            <i class="fas fa-chart-radar"></i> Generate Skill Analysis
+                        </button>
+                        
+                        <div id="skills-results" class="mt-2"></div>
+                    </div>
+                </section>
+
+                <!-- Psychology Evaluation Section -->
+                <section id="psych-eval" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">Psychological Evaluation</h2>
+                            <p class="card-subtitle">Comprehensive assessment of your learning traits and capabilities</p>
+                        </div>
+                        
+                        <div id="psych-intro">
+                            <p class="mb-2">This evaluation will assess 15 key psychological criteria that influence academic success. Each question is tailored to your background and goals.</p>
+                            <button class="btn" onclick="startPsychEval()">
+                                <i class="fas fa-brain"></i> Start Evaluation
+                            </button>
+                        </div>
+                        
+                        <div id="psych-question" class="hidden">
+                            <div class="form-group">
+                                <label class="form-label" id="question-text">Loading question...</label>
+                                <textarea class="form-input" id="psych-response" placeholder="Type your response here..." rows="4"></textarea>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <span id="progress-text" class="text-sm text-gray-600">Question 1 of 15</span>
+                                <button class="btn" onclick="submitPsychResponse()">
+                                    <i class="fas fa-arrow-right"></i> Submit Answer
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="psych-complete" class="hidden text-center">
+                            <i class="fas fa-check-circle" style="font-size: 3rem; color: var(--primary-black); margin-bottom: 1rem;"></i>
+                            <h3>Evaluation Complete!</h3>
+                            <p>Your psychological profile has been updated and will be used to provide personalized recommendations.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Chat Section -->
+                <section id="chat" class="section">
+                    <div class="card">
+                        <div class="card-header">
+                            <h2 class="card-title">AI Academic Mentor</h2>
+                            <p class="card-subtitle">Get personalized guidance based on your profile and goals</p>
+                        </div>
+                        
+                        <div class="chat-container">
+                            <div class="chat-messages" id="chat-messages">
+                                <div class="message ai">
+                                    <strong>AI Mentor:</strong> Hello! I'm here to help you with academic guidance. I can provide personalized advice based on your profile, academic history, and psychological assessment. What would you like to discuss?
+                                </div>
+                            </div>
+                            <div class="chat-input-container">
+                                <input type="text" class="chat-input form-input" id="chat-input" placeholder="Type your message here..." onkeypress="if(event.key==='Enter') sendMessage()">
+                                <button class="btn" onclick="sendMessage()">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Global variables
+        let currentUser = null;
+        let psychEvalCriteria = [
+            "Analytical Thinking", "Creativity", "Logical Reasoning", "Problem-Solving", 
+            "Decision-Making", "Emotional Resilience", "Motivation", "Curiosity", 
+            "Attention to Detail", "Communication Skills", "Collaboration", "Risk-Taking", 
+            "Self-Discipline", "Learning Style Preference", "Adaptability"
+        ];
+        let currentCriterionIndex = 0;
+
+        // Navigation functions
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.section').forEach(section => {
+                section.classList.remove('active');
             });
-            let avgGrade = totalCredits > 0 ? (weightedSum / totalCredits).toFixed(2) : "N/A";
-            outputHTML += `<p>Average Grade for Semester ${selectedSem}: ${avgGrade}%</p>`;
-          } else {
-            outputHTML += `<p>No academic data found for Semester ${selectedSem}. Using most recent available data.</p>`;
-          }
-          document.getElementById("predictOutput").innerHTML = outputHTML;
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("predictOutput").innerHTML = "<p style='color:red;'>Error loading academic history for prediction.</p>";
+            
+            // Show target section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-nav button').forEach(button => {
+                button.classList.remove('active');
+            });
+            
+            // Find and activate corresponding sidebar button
+            const sidebarButton = document.querySelector(`[onclick="showSection('${sectionId}')"]`);
+            if (sidebarButton) {
+                sidebarButton.classList.add('active');
+            }
+            
+            // Update header buttons based on login state
+            updateHeaderButtons();
+        }
+
+        function updateHeaderButtons() {
+            const navButtons = document.querySelector('.nav-buttons');
+            if (currentUser) {
+                navButtons.innerHTML = `
+                    <span style="color: var(--light-gray); margin-right: 1rem;">Welcome, ${currentUser.name}</span>
+                    <button class="nav-btn secondary" onclick="logout()">Logout</button>
+                `;
+            } else {
+                navButtons.innerHTML = `
+                    <button class="nav-btn secondary" onclick="showSection('register')">Sign Up</button>
+                    <button class="nav-btn" onclick="showSection('login')">Login</button>
+                `;
+            }
+        }
+
+        // Authentication functions
+        async function registerUser() {
+            const userData = {
+                username: document.getElementById('reg-username').value,
+                password: document.getElementById('reg-password').value,
+                name: document.getElementById('reg-name').value,
+                age: document.getElementById('reg-age').value,
+                discipline: document.getElementById('reg-discipline').value,
+                current_semester: document.getElementById('reg-semester').value,
+                career_goal: document.getElementById('reg-career').value
+            };
+
+            try {
+                const response = await fetch('/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(userData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('Registration successful! Please login to continue.', 'success');
+                    showSection('login');
+                } else {
+                    showAlert(result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Registration failed. Please try again.', 'error');
+            }
+        }
+
+        async function loginUser() {
+            const loginData = {
+                username: document.getElementById('login-username').value,
+                password: document.getElementById('login-password').value
+            };
+
+            try {
+                const response = await fetch('/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(loginData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentUser = result.user;
+                    updateProfileForm(currentUser);
+                    showAlert('Login successful!', 'success');
+                    showSection('dashboard');
+                    updateHeaderButtons();
+                } else {
+                    showAlert(result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Login failed. Please try again.', 'error');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            updateHeaderButtons();
+            showSection('dashboard');
+            showAlert('Logged out successfully.', 'success');
+        }
+
+        // Profile functions
+        function updateProfileForm(user) {
+            document.getElementById('profile-username').value = user.username || '';
+            document.getElementById('profile-name').value = user.name || '';
+            document.getElementById('profile-age').value = user.age || '';
+            document.getElementById('profile-discipline').value = user.discipline || '';
+            document.getElementById('profile-semester').value = user.current_semester || '';
+            document.getElementById('profile-career').value = user.career_goal || '';
+        }
+
+        async function updateProfile() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            const profileData = {
+                username: currentUser.username,
+                name: document.getElementById('profile-name').value,
+                age: document.getElementById('profile-age').value,
+                discipline: document.getElementById('profile-discipline').value,
+                current_semester: document.getElementById('profile-semester').value,
+                career_goal: document.getElementById('profile-career').value
+            };
+
+            try {
+                const response = await fetch('/update_profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(profileData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    currentUser = result.user;
+                    showAlert('Profile updated successfully!', 'success');
+                } else {
+                    showAlert(result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Profile update failed. Please try again.', 'error');
+            }
+        }
+
+        // Course functions
+        async function getCourses() {
+            const discipline = document.getElementById('course-discipline').value;
+            const semester = document.getElementById('course-semester').value;
+
+            if (!discipline || !semester) {
+                showAlert('Please enter both discipline and semester.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/get_courses?discipline=${encodeURIComponent(discipline)}&semester=${semester}`);
+                const result = await response.json();
+                
+                const resultsDiv = document.getElementById('courses-results');
+                
+                if (response.ok && result.length > 0) {
+                    let html = '<div class="table-container"><table class="table"><thead><tr><th>Course Code</th><th>Course Title</th><th>Credits</th><th>Type</th><th>Description</th></tr></thead><tbody>';
+                    
+                    result.forEach(course => {
+                        const courseType = course.Mandatory == 1 ? 'Mandatory' : 'Optional';
+                        html += `
+                            <tr>
+                                <td><strong>${course['Course Code']}</strong></td>
+                                <td>${course['Course Title']}</td>
+                                <td>${course['Credits']}</td>
+                                <td><span class="badge ${courseType.toLowerCase()}">${courseType}</span></td>
+                                <td>${course['Description'] || 'No description available'}</td>
+                            </tr>
+                        `;
+                    });
+                    
+                    html += '</tbody></table></div>';
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert error">${result.response || 'No courses found.'}</div>`;
+                }
+            } catch (error) {
+                showAlert('Failed to fetch courses. Please try again.', 'error');
+            }
+        }
+
+        // Academic history functions
+        async function loadSubjects() {
+            const semester = document.getElementById('history-semester').value;
+            const subjectSelect = document.getElementById('history-subject');
+            
+            if (!currentUser || !semester) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/get_courses?discipline=${encodeURIComponent(currentUser.discipline)}&semester=${semester}`);
+                const result = await response.json();
+                
+                subjectSelect.innerHTML = '<option value="">Select subject</option>';
+                
+                if (response.ok && result.length > 0) {
+                    result.forEach(course => {
+                        const option = document.createElement('option');
+                        option.value = course['Course Code'];
+                        option.textContent = `${course['Course Code']} - ${course['Course Title']}`;
+                        subjectSelect.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error('Failed to load subjects:', error);
+            }
+        }
+
+        async function addHistory() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            const historyData = {
+                username: currentUser.username,
+                subject: {
+                    semester: document.getElementById('history-semester').value,
+                    subject_code: document.getElementById('history-subject').value,
+                    grade: document.getElementById('history-grade').value,
+                    attendance: document.getElementById('history-attendance').value
+                }
+            };
+
+            try {
+                const response = await fetch('/add_history', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(historyData)
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    showAlert('Academic record added successfully!', 'success');
+                    document.querySelector('#history form').reset();
+                } else {
+                    showAlert(result.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to add academic record. Please try again.', 'error');
+            }
+        }
+
+        async function viewHistory() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/get_history?username=${currentUser.username}`);
+                const result = await response.json();
+                
+                const resultsDiv = document.getElementById('history-results');
+                const selectedSemester = document.getElementById('view-semester').value;
+                
+                if (response.ok && result.length > 0) {
+                    let filteredResults = result;
+                    if (selectedSemester) {
+                        filteredResults = result.filter(record => record.semester == selectedSemester);
+                    }
+                    
+                    if (filteredResults.length > 0) {
+                        let html = '<div class="table-container"><table class="table"><thead><tr><th>Course Code</th><th>Course Title</th><th>Grade</th><th>Attendance</th><th>Credits</th><th>Semester</th></tr></thead><tbody>';
+                        
+                        filteredResults.forEach(record => {
+                            html += `
+                                <tr>
+                                    <td><strong>${record.subject_code}</strong></td>
+                                    <td>${record.course_title}</td>
+                                    <td>${record.grade}</td>
+                                    <td>${record.attendance}%</td>
+                                    <td>${record.credits}</td>
+                                    <td>Semester ${record.semester}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        html += '</tbody></table></div>';
+                        resultsDiv.innerHTML = html;
+                    } else {
+                        resultsDiv.innerHTML = '<div class="alert error">No records found for the selected semester.</div>';
+                    }
+                } else {
+                    resultsDiv.innerHTML = '<div class="alert error">No academic records found.</div>';
+                }
+            } catch (error) {
+                showAlert('Failed to fetch academic history. Please try again.', 'error');
+            }
+        }
+
+        // Recommendation functions
+        async function recommendCourses() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            const semester = document.getElementById('recommend-semester').value;
+            if (!semester) {
+                showAlert('Please select a semester.', 'error');
+                return;
+            }
+
+            const requestData = {
+                username: currentUser.username,
+                semester: semester
+            };
+
+            try {
+                const response = await fetch('/recommend_courses', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+                const resultsDiv = document.getElementById('recommendations-results');
+                
+                if (response.ok) {
+                    let html = '<div class="card"><div class="card-header"><h3 class="card-title">AI Recommendations</h3></div>';
+                    html += `<div style="white-space: pre-line; font-family: monospace; background: var(--bg-gray); padding: 1rem; border-radius: 8px; margin-top: 1rem;">${result.recommendation_explanation}</div></div>`;
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert error">${result.error}</div>`;
+                }
+            } catch (error) {
+                showAlert('Failed to get recommendations. Please try again.', 'error');
+            }
+        }
+
+        // Grade prediction functions
+        async function predictGrades() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            const semester = document.getElementById('predict-semester').value;
+            const targetGrade = document.getElementById('target-grade').value;
+
+            if (!semester) {
+                showAlert('Please select a semester.', 'error');
+                return;
+            }
+
+            const requestData = {
+                username: currentUser.username,
+                semester: semester,
+                target_grade: targetGrade || null
+            };
+
+            try {
+                const response = await fetch('/predict_grades', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestData)
+                });
+
+                const result = await response.json();
+                const resultsDiv = document.getElementById('predictions-results');
+                
+                if (response.ok) {
+                    let html = '<div class="card"><div class="card-header"><h3 class="card-title">Grade Predictions</h3></div>';
+                    html += `<div style="white-space: pre-line; font-family: monospace; background: var(--bg-gray); padding: 1rem; border-radius: 8px; margin-top: 1rem;">${result.predicted_grade_details}</div></div>`;
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert error">${result.error}</div>`;
+                }
+            } catch (error) {
+                showAlert('Failed to predict grades. Please try again.', 'error');
+            }
+        }
+
+        // Skill chart functions
+        async function generateSkillChart() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/generate_skill_chart?username=${currentUser.username}`);
+                const result = await response.json();
+                const resultsDiv = document.getElementById('skills-results');
+                
+                if (response.ok) {
+                    let html = '<div class="grid grid-2">';
+                    
+                    // Current Skills
+                    html += '<div class="card"><div class="card-header"><h3 class="card-title">Current Skills</h3></div><ul style="list-style: none; padding: 0;">';
+                    for (const [skill, level] of Object.entries(result.current)) {
+                        html += `<li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);"><span>${skill}</span><strong>${level}/100</strong></li>`;
+                    }
+                    html += '</ul></div>';
+                    
+                    // Required Skills
+                    html += '<div class="card"><div class="card-header"><h3 class="card-title">Required Skills</h3></div><ul style="list-style: none; padding: 0;">';
+                    for (const [skill, level] of Object.entries(result.required)) {
+                        html += `<li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border);"><span>${skill}</span><strong>${level}/100</strong></li>`;
+                    }
+                    html += '</ul></div>';
+                    
+                    html += '</div>';
+                    resultsDiv.innerHTML = html;
+                } else {
+                    resultsDiv.innerHTML = `<div class="alert error">Failed to generate skill chart.</div>`;
+                }
+            } catch (error) {
+                showAlert('Failed to generate skill chart. Please try again.', 'error');
+            }
+        }
+
+        // Psychology evaluation functions
+        function startPsychEval() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            currentCriterionIndex = 0;
+            document.getElementById('psych-intro').classList.add('hidden');
+            document.getElementById('psych-question').classList.remove('hidden');
+            loadNextQuestion();
+        }
+
+        async function loadNextQuestion() {
+            if (currentCriterionIndex >= psychEvalCriteria.length) {
+                document.getElementById('psych-question').classList.add('hidden');
+                document.getElementById('psych-complete').classList.remove('hidden');
+                return;
+            }
+
+            const criterion = psychEvalCriteria[currentCriterionIndex];
+            document.getElementById('progress-text').textContent = `Question ${currentCriterionIndex + 1} of ${psychEvalCriteria.length}`;
+
+            try {
+                const response = await fetch('/psych_eval_question', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        current_criterion: criterion
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    document.getElementById('question-text').textContent = result.question;
+                    document.getElementById('psych-response').value = '';
+                } else {
+                    showAlert('Failed to load question. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to load question. Please try again.', 'error');
+            }
+        }
+
+        async function submitPsychResponse() {
+            const response = document.getElementById('psych-response').value.trim();
+            
+            if (!response) {
+                showAlert('Please provide a response.', 'error');
+                return;
+            }
+
+            const criterion = psychEvalCriteria[currentCriterionIndex];
+
+            try {
+                const apiResponse = await fetch('/psych_eval_rank', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        criterion: criterion,
+                        response: response
+                    })
+                });
+
+                const result = await apiResponse.json();
+                
+                if (apiResponse.ok) {
+                    currentCriterionIndex++;
+                    loadNextQuestion();
+                } else {
+                    showAlert('Failed to submit response. Please try again.', 'error');
+                }
+            } catch (error) {
+                showAlert('Failed to submit response. Please try again.', 'error');
+            }
+        }
+
+        // Chat functions
+        async function sendMessage() {
+            if (!currentUser) {
+                showAlert('Please login first.', 'error');
+                return;
+            }
+
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            
+            if (!message) return;
+
+            // Add user message to chat
+            addMessageToChat('user', message);
+            input.value = '';
+
+            // Show loading
+            const loadingDiv = document.createElement('div');
+            loadingDiv.className = 'message ai loading-message';
+            loadingDiv.innerHTML = '<span class="loading"><span class="spinner"></span> AI is thinking...</span>';
+            document.getElementById('chat-messages').appendChild(loadingDiv);
+            scrollChatToBottom();
+
+            try {
+                const response = await fetch('/chat_with_ai', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: currentUser.username,
+                        message: message
+                    })
+                });
+
+                const result = await response.json();
+                
+                // Remove loading message
+                loadingDiv.remove();
+                
+                if (response.ok) {
+                    addMessageToChat('ai', result.response);
+                } else {
+                    addMessageToChat('ai', 'Sorry, I encountered an error. Please try again.');
+                }
+            } catch (error) {
+                loadingDiv.remove();
+                addMessageToChat('ai', 'Sorry, I encountered an error. Please try again.');
+            }
+        }
+
+        function addMessageToChat(sender, message) {
+            const messagesDiv = document.getElementById('chat-messages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            
+            if (sender === 'ai') {
+                messageDiv.innerHTML = `<strong>AI Mentor:</strong> ${message}`;
+            } else {
+                messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+            }
+            
+            messagesDiv.appendChild(messageDiv);
+            scrollChatToBottom();
+        }
+
+        function scrollChatToBottom() {
+            const messagesDiv = document.getElementById('chat-messages');
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        // Utility functions
+        function showAlert(message, type = 'success') {
+            // Remove existing alerts
+            document.querySelectorAll('.alert').forEach(alert => {
+                if (!alert.closest('.section')) return;
+                alert.remove();
+            });
+
+            // Create new alert
+            const alert = document.createElement('div');
+            alert.className = `alert ${type}`;
+            alert.textContent = message;
+
+            // Add to current active section
+            const activeSection = document.querySelector('.section.active');
+            if (activeSection) {
+                activeSection.insertBefore(alert, activeSection.firstChild);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    alert.remove();
+                }, 5000);
+            }
+        }
+
+        function cancelProfileEdit() {
+            if (currentUser) {
+                updateProfileForm(currentUser);
+                showAlert('Changes cancelled.', 'success');
+            }
+        }
+
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
+            showSection('dashboard');
         });
-    }
-    
-    // Predict the needed grades by calling the /predict_grades endpoint.
-    function predictNeededGrade() {
-      const selectedSem = document.getElementById("predictSemester").value;
-      const target = document.getElementById("dreamGrade").value;
-      
-      fetch('/predict_grades', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ 
-           username: loggedUsername, 
-           semester: selectedSem, 
-           target_grade: target 
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        displayPredictionResults(data);
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("predictOutput").innerHTML = "<p style='color:red;'>Error predicting grades.</p>";
-      });
-    }
-    
-    function displayPredictionResults(data) {
-      const outputDiv = document.getElementById("predictOutput");
-      if (data.error) {
-          outputDiv.innerHTML = `<p class="error">${data.error}</p>`;
-          return;
-      }
-      
-      // Add custom styling for the table display
-      outputDiv.innerHTML = `
-          <div class="prediction-table">
-              <div class="table-container" style="
-                  font-family: 'Courier New', monospace;
-                  background: white;
-                  padding: 20px;
-                  border-radius: 8px;
-                  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-                  overflow-x: auto;
-                  margin-top: 20px;
-              ">
-                  <table style="
-                      width: 100%;
-                      border-collapse: collapse;
-                      text-align: center;
-                  ">
-                      <thead>
-                          <tr>
-                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Course Code</th>
-                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Predicted Grade</th>
-                              <th style="padding: 12px; border-bottom: 2px solid #ddd;">Required Grade</th>
-                          </tr>
-                      </thead>
-                      <tbody>
-                          ${formatPredictionData(data.predicted_grade_details)}
-                      </tbody>
-                  </table>
-              </div>
-          </div>
-      `;
-  }
-  
-  function formatPredictionData(details) {
-      // Remove the ASCII table borders and split into lines
-      const lines = details.split('\n')
-          .filter(line => line.includes('|') && !line.includes('-+-'))
-          .map(line => line.trim())
-          .filter(line => line !== '');
-  
-      // Process each line into table rows
-      return lines.map(line => {
-          const [code, predicted, required] = line.split('|')
-              .map(cell => cell.trim())
-              .filter(cell => cell !== '');
-              
-          return `
-              <tr style="border-bottom: 1px solid #eee;">
-                  <td style="padding: 12px;">${code}</td>
-                  <td style="padding: 12px;">${predicted}</td>
-                  <td style="padding: 12px;">${required}</td>
-              </tr>
-          `;
-      }).join('');
-  }
-  
-
-    let currentCriterionIndex = 0;
-    const criteria = [
-      "Analytical Thinking",
-      "Creativity",
-      "Logical Reasoning",
-      "Problem-Solving",
-      "Decision-Making",
-      "Emotional Resilience",
-      "Motivation",
-      "Curiosity",
-      "Attention to Detail",
-      "Communication Skills",
-      "Collaboration",
-      "Risk-Taking",
-      "Self-Discipline",
-      "Learning Style Preference",
-      "Adaptability"
-    ];
-
-    function startPsychEval() {
-      currentCriterionIndex = 0;
-      document.getElementById("psychEvalQuestion").classList.add("hidden");
-      document.getElementById("psychEvalForm").classList.remove("hidden");
-      fetchNextQuestion();
-    }
-
-    function fetchNextQuestion() {
-      if (currentCriterionIndex < criteria.length) {
-        const currentCriterion = criteria[currentCriterionIndex];
-        fetch('/psych_eval_question', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username: loggedUsername, current_criterion: currentCriterion })
-        })
-          .then(response => response.json())
-          .then(data => {
-            document.getElementById("currentQuestionText").textContent = data.question;
-          })
-          .catch(error => {
-            console.error(error);
-            document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error fetching question.</p>";
-          });
-      } else {
-        document.getElementById("psychEvalForm").classList.add("hidden");
-        document.getElementById("psychEvalOutput").innerHTML = "<p>Evaluation complete. Thank you!</p>";
-      }
-    }
-
-    function submitPsychEvalAnswer() {
-      const answer = document.getElementById("currentAnswer").value.trim();
-      if (!answer) {
-        alert("Please provide a response before submitting.");
-        return;
-      }
-
-      const currentCriterion = criteria[currentCriterionIndex];
-      fetch('/psych_eval_rank', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username: loggedUsername, criterion: currentCriterion, response: answer })
-      })
-        .then(response => response.json())
-        .then(data => {
-          
-          currentCriterionIndex++;
-          fetchNextQuestion();
-        })
-        .catch(error => {
-          console.error(error);
-          document.getElementById("psychEvalOutput").innerHTML = "<p style='color: red;'>Error ranking response.</p>";
-        });
-    }
-
-    window.addEventListener("load", populatePredictSemesters);
-  </script>
+    </script>
 </body>
 </html>
